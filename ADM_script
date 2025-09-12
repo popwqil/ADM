@@ -572,8 +572,6 @@ local function build_slots(SlotsFrame, AddItem)
 			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
 			
-			SlotsFrame:_init_slot_item_image(v68, Data)
-			SlotsFrame:_init_slot_tag_display(v68, Data)
 			
 			lastIndexWithData = Index
 		else
