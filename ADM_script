@@ -33,6 +33,9 @@ local get_class = function(Module)
 	if Module == "BackpackApp" then
 		return require(game.ReplicatedStorage.ClientModules.Core.UIManager.Apps.BackpackApp.BackpackApp)
 	end
+	if Module == "CustomButton" then
+		return require(game.ReplicatedStorage.ClientModules.Core.UIManager.Elements.Buttons.CustomButton)
+	end
 end;
 local function Wrap(p23, p24)
 	return get_class(p24).new({
@@ -520,15 +523,17 @@ UpdateTradePlayers()
 TradeTab:Separator({Text = "Fake Trade"})
 
 local Offer = {
-	negotiated = false,
 	trade_state = "negotiation",
-	can_add_AddItem = false,
 	Offers = {
 		My = {
+			accepted_negotiation = false,
+			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {}
 		},
 		Partner = {
+			accepted_negotiation = false,
+			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {}
 		},
@@ -588,19 +593,30 @@ local function StartTrade()
 
 	local AcceptWrapButton
 
-	local function refresh_all()
+	function refresh_all()
 		if Offer.trade_state == "negotiation" then
-			if Offer.negotiated then
+			if Offer.Offers.My.accepted_negotiation then
 				NegotiationFrame.Body.MyOffer.Accepted.Visible = true
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0.3
+
 				AcceptWrapButton:set_state("selected")
 				AcceptWrapButton.Text = "Unaccept"
 			else
 				NegotiationFrame.Body.MyOffer.Accepted.Visible = false
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0
+
 				AcceptWrapButton:set_state("normal")
 				AcceptWrapButton.Text = "Accept"
 			end
+			
+			if Offer.Offers.Partner.accepted_negotiation then
+				NegotiationFrame.Body.PartnerOffer.Accepted.Visible = true
+				NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0.3
+			else
+				NegotiationFrame.Body.PartnerOffer.Accepted.Visible = false
+				NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
+			end
+			
 		end
 	end
 
@@ -643,7 +659,6 @@ local function StartTrade()
 	build_slots(NegotiationFrame.Body.MyOffer.Slots, true)
 	build_slots(NegotiationFrame.Body.PartnerOffer.Slots, false)
 
-
 	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
 		["mouse_button1_click"] = function()
@@ -664,7 +679,7 @@ local function StartTrade()
 	})
 	
 	local ProfileButtonPartner = NegotiationFrame.Header.ProfileButtonPartner
-	Wrap(ProfileButtonPartner, "DepthButton"):start({
+	Wrap(ProfileButtonPartner, "CustomButton"):start({
 		["mouse_button1_click"] = function()
 			local IdFromName = game.Players:GetUserIdFromNameAsync(AdoptMeHelper.FakeTrades.PartnerName)
 			OpenProfile(IdFromName)
@@ -687,6 +702,22 @@ TradeTab:Checkbox({
 	Callback = function(self, Value)
 		AdoptMeHelper.FakeTrades.Friend = Value
 	end,
+})
+
+TradeTab:Checkbox({
+	Label = "Partner Accept 1",
+	Value = false,
+	Callback = function(self, Value)
+		Offer.Offers.Partner.accepted_negotiation = Value
+		refresh_all()
+	end,
+})
+
+TradeTab:Button({
+	Text = "Make fake trade",
+	Callback = function()
+		StartTrade()
+	end
 })
 
 TradeTab:Button({
