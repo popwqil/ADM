@@ -639,7 +639,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
 			if PetData.unique == pet_in_slot.unique then
 				pe = PetData
-				dump(pe)
+				print(dump(pe))
 			end
 		end
 		
