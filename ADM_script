@@ -658,7 +658,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		local ImagePetDataBase
 		for i,v in pairs(petDatabase) do
 			if i == PD.kind then
-				ImagePetDataBase = v.Image
+				ImagePetDataBase = v.image
 			end
 		end
 		
