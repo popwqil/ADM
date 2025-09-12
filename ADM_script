@@ -648,21 +648,24 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		for i,v in pairs(Cloned:GetChildren()) do
 			if v:IsA("ImageLabel") then
 				v.Visible = false
-				v.Visible = PD.properties[v.Name] == true
+			end
+			v.flyable.Visible = PD.properties.flyable
+			v.rideable.Visible = PD.properties.rideable
+			v.mega_neon.Visible = PD.properties.mega_neon
+			v.neon.Visible = PD.properties.neon
+		end
+		
+		local ImagePetDataBase
+		for i,v in pairs(petDatabase) do
+			if i == PD.kind then
+				ImagePetDataBase = v.Image
 			end
 		end
 		
-		local fixed_property_size = load("PlatformM").get_platform() == "phone" and 18 or 20
-		local v30 = fixed_property_size / 15
-		local v31 = Cloned.Size
-		Cloned.Size = UDim2.new(v31.X.Scale, v31.X.Offset * v30, v31.Y.Scale, fixed_property_size)
-		local v32 = Cloned.Position
-		Cloned.Position = UDim2.new(v32.X.Scale, v32.X.Offset * v30, v32.Y.Scale, v32.Y.Offset * v30)
-		pcall(function()
-			local clone_UIGridLayout = TagDisplayTemplate:FindFirstChildOfClass("UIGridLayout")
-			clone_UIGridLayout.Parent = Cloned
-			Cloned.UIGridLayout.CellSize = UDim2.fromOffset(fixed_property_size, fixed_property_size)
-		end)
+		local ItemImageTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.ItemImageTemplate
+		local Cloned2 = ItemImageTemplate:Clone()
+		Cloned2.Parent = v69
+			Cloned2.Image = ImagePetDataBase
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
