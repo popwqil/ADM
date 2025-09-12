@@ -566,26 +566,31 @@ function build_slot(p_u_66, Index)
 		end,
 		["shine"] = true
 	})
-	
+
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
 	v69.LayoutOrder = Index
 	v69.AddItem:Destroy()
 	v69.Parent = p_u_66.instance.Slots
-	local v70 = Offer.shown_items[Index]
+
+	-- Проверяем, существует ли элемент в shown_items
+	local v70 = Offer.shown_items and Offer.shown_items[Index]
+
 	if v70 then
 		v69.ImageTransparency = 0
 		local v_u_71 = v70.item
-		
+
 		v69.Activated:Connect(function()
-			
+			-- действие при активации
 		end)
 	else
 		v69.ImageTransparency = 0.5
 	end
+
 	return v69
 end
+
 function init_slot_item_image(Frame, ItemData)
 	local v77 = load("UIManager").wrap(Frame, "ItemDataImage"):start({
 		["item_data"] = ItemData,
