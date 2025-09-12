@@ -642,21 +642,23 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		end
 
 		
-		--[[
 		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
 		local Cloned = TagDisplayTemplate:Clone()
 		Cloned.Parent = v69
 		for i,v in pairs(Cloned:GetChildren()) do
-			v.Visible = false
-			v.Visible = PD.properties[v.Name]
+			if v:IsA("ImageLabel") then
+				v.Visible = false
+				v.Visible = PD.properties[v.Name]
+			end
 		end
-		]]
 		
-		load("UIManager").wrap(v69, "ItemDataTagDisplay"):start({
-			["fixed_property_size"] = load("PlatformM").get_platform() == "phone" and 18 or 20,
-			["item_data"] = PD.properties,
-			["wearing"] = false
-		})
+		local fixed_property_size = load("PlatformM").get_platform() == "phone" and 18 or 20
+		local v30 = fixed_property_size / 15
+		local v31 = Cloned.Size
+		Cloned.Size = UDim2.new(v31.X.Scale, v31.X.Offset * v30, v31.Y.Scale, fixed_property_size)
+		local v32 = Cloned.Position
+		Cloned.Position = UDim2.new(v32.X.Scale, v32.X.Offset * v30, v32.Y.Scale, v32.Y.Offset * v30)
+		Cloned.UIGridLayout.CellSize = UDim2.fromOffset(fixed_property_size, fixed_property_size)
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
