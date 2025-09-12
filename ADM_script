@@ -636,7 +636,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 
 		local PD
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
-			if PetData.unique == pet_in_slot.unique then
+			if PetData.unique == pet_in_slot then
 				PD = PetData
 			end
 		end
