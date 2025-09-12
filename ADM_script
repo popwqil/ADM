@@ -528,6 +528,7 @@ local v_u_12 = {
 	["Removed"] = 2,
 	["Changed"] = 3
 }
+
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
@@ -546,33 +547,59 @@ local Offer = {
 }
 
 function clear_slots(p81)
-	
+
 end
+
 function build_all_slots(p_u_42)
 	clear_slots()
-	for v43 = 1, 9 do
+	for v43 = 1, Offer.Offers.My.num_slots do
 		local v44 = build_slot(p_u_42, v43)
 	end
 end
-function build_slot(p_u_66, Index)
-	local v68 = p_u_66.slot_template.AddItem:Clone()
-	v68.Visible = true
-	v68.Name = "AddItem"
-	v68.LayoutOrder = Index
-	v68.Parent = p_u_66.instance.Slots
-	local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
-		["mouse_button1_click"] = function()
-			local v161 = load("UIManager").apps.BackpackApp:pick_item({
-				["keep_cached_scroll_positions_on_open"] = true,
-				["allow_callback"] = function(_)
-					return true;
-				end
-			})
-			Offer.Offers.My.shown_pets[Index] = v161
-		end,
-		["shine"] = true
-	})
 
+function build_slot(p_u_66, Index)
+	-- Проверяем есть ли питомец в этом слоте
+	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
+
+	-- Находим первый свободный слот для AddItem
+	local first_empty_slot = nil
+	for i = 1, Offer.Offers.My.num_slots do
+		if not Offer.Offers.My.shown_pets[i] then
+			first_empty_slot = i
+			break
+		end
+	end
+
+	-- Если это первый свободный слот, создаем AddItem
+	if Index == first_empty_slot then
+		local v68 = p_u_66.slot_template.AddItem:Clone()
+		v68.Visible = true
+		v68.Name = "AddItem"
+		v68.LayoutOrder = Index
+		v68.Parent = p_u_66.instance.Slots
+
+		local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
+			["mouse_button1_click"] = function()
+				local v161 = load("UIManager").apps.BackpackApp:pick_item({
+					["keep_cached_scroll_positions_on_open"] = true,
+					["allow_callback"] = function(_)
+						return true;
+					end
+				})
+
+				if v161 then
+					-- Добавляем unique питомца в этот слот
+					Offer.Offers.My.shown_pets[Index] = v161.unique
+					-- Перестраиваем все слоты
+					build_all_slots(p_u_66)
+				end
+			end,
+			["shine"] = true
+		})
+		return v68
+	end
+
+	-- Создаем обычный PetTemplate слот
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
@@ -580,15 +607,11 @@ function build_slot(p_u_66, Index)
 	v69.AddItem:Destroy()
 	v69.Parent = p_u_66.instance.Slots
 
-	local v70 = Offer.shown_items and Offer.shown_items[Index]
-
-	if v70 then
+	-- Устанавливаем прозрачность в зависимости от наличия питомца
+	if pet_in_slot then
 		v69.ImageTransparency = 0
-		--[[local v_u_71 = v70.item
-		p_u_66:_init_slot_item_image(v69, v_u_71)
-		if not p_u_66.props.do_not_display_tags then
-			p_u_66:_init_slot_tag_display(v69, v_u_71)
-		end]]
+		-- Инициализируем изображение питомца
+		init_slot_item_image(v69, pet_in_slot)
 	else
 		v69.ImageTransparency = 0.5
 	end
