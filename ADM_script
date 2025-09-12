@@ -553,7 +553,8 @@ local function build_slots(SlotsFrame, AddItem)
 				local v4 = load("UIManager").apps.BackpackApp:pick_item({
 					["allow_callback"] = function(_)
 						return true
-					end
+					end,
+					["shine"] = true
 				})
 				
 				-- v4.unique
