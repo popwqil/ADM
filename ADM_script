@@ -562,11 +562,15 @@ local Offer = {
 }
 
 local function build_slots(SlotsFrame)
+	local addItemCreated = false -- Флаг для создания только одного AddItem
 	local lastIndexWithData = nil
+
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		print("Index: " .. Index)  -- Логируем индекс для отладки
-		if Data ~= false then  -- Проверка, что данные не равны false
+
+		-- Если слот заполнен
+		if Data ~= false then  
 			local v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
 			v68.Name = "Slot" .. Index
@@ -578,24 +582,31 @@ local function build_slots(SlotsFrame)
 			lastIndexWithData = Index
 		else
 			local v68
-			if lastIndexWithData == nil then
+
+			-- Добавляем только один AddItem, если он еще не был создан
+			if not addItemCreated then
 				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
 				v68.Visible = true
 				v68.Name = "AddItem"
-				v68.LayoutOrder = 1
+				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
 
-				print("Created AddItem at position 1")
+				-- Устанавливаем флаг, чтобы больше не создавать AddItem
+				addItemCreated = true
+
+				print("Created AddItem at position " .. (lastIndexWithData == nil and 1 or lastIndexWithData + 1))
 			else
-				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
+				-- Для остальных пустых слотов создаем SlotTemplate
+				v68 = SlotsFrame.SlotTemplate:Clone()
 				v68.Visible = true
-				v68.Name = "AddItem"
-				v68.LayoutOrder = lastIndexWithData + 1
+				v68.Name = "Slot" .. Index
+				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
 
-				print("Created AddItem after Slot " .. lastIndexWithData)
+				print("Created SlotTemplate at position " .. (lastIndexWithData == nil and 1 or lastIndexWithData + 1))
 			end
 
+			-- Проверка на уникальность для добавления в слот
 			Wrap(v68, "DepthButton"):start({
 				["mouse_button1_click"] = function()
 					local v4 = load("UIManager").apps.BackpackApp:pick_item({
@@ -612,6 +623,7 @@ local function build_slots(SlotsFrame)
 		end
 	end
 end
+
 
 
 
