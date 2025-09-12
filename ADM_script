@@ -261,13 +261,6 @@ old_refresh_all = hookfunction(TradeApp.refresh_all, function(app, ...)
 	return result
 end)
 
-local old_backpackApp_start 
-local Saved_start_backpackapp
-old_backpackApp_start = hookfunction(BackpackApp.start, function(app)
-	Saved_start_backpackapp = app
-	return old_backpackApp_start(app)
-end)
-
 getgenv().UsedAges = getgenv().UsedAges or {}
 local function getUniqueRandomAge()
 	local age
@@ -552,11 +545,12 @@ local function build_slots(SlotsFrame, AddItem)
 		Wrap(v68, "DepthButton"):start({ 
 			["mouse_button1_click"] = function() 
 
-				local v4 = BackpackApp:pick_item({
+				local v4 = load("UIManager").apps.BackpackApp:pick_item({
 					["allow_callback"] = function(_)
 						return true
 					end
 				})
+				
 				-- v4.unique
 			end
 		})
