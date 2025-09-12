@@ -561,27 +561,33 @@ local Offer = {
 	},
 }
 
-local function build_slots(SlotsFrame)
-	-- Очищаем все слоты перед новым построением
+local function reset_offer(SlotsFrame)
+	for i = 1, 9 do
+		Offer.Offers.My.Offer[i].unique = ""
+		Offer.Offers.Partner.Offer[i].unique = ""
+	end
+
 	for _, slot in ipairs(SlotsFrame:GetChildren()) do
 		if slot:IsA("ImageButton") then
-			if slot.name ~= "SlotTemplate" then
+			if slot.Name ~= "SlotTemplate" then
 				slot:Destroy()
 			end
 		end
 	end
 
+	build_slots(SlotsFrame)
+end
+
+function build_slots(SlotsFrame)
+	reset_offer(SlotsFrame)
+
 	local addItemCreated = false
 	local lastIndexWithData = nil
 	local addItemSlot = nil
-	local nextSlot = nil  -- Следующий слот для AddItem
-
-	-- Перебираем все слоты
+	local nextSlot = nil
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		local v68
-
-		-- Если слот заполнен (есть уникальные данные)
 		if Data.unique ~= "" then  
 			v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
@@ -589,26 +595,16 @@ local function build_slots(SlotsFrame)
 			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
 			v68.AddItem:Destroy()
-			v68.ImageTransparency = 0  -- Сделать слот видимым
-
-			-- Инициализируем содержимое слота (например, добавить изображение, если нужно)
-			-- Пример:
-			-- local itemImage = Instance.new("ImageLabel")
-			-- itemImage.Size = UDim2.new(1, 0, 1, 0)
-			-- itemImage.Image = "rbxassetid://" .. Data.unique  -- Поставить изображение
-			-- itemImage.Parent = v68
+			v68.ImageTransparency = 0
 
 			lastIndexWithData = Index
 		else
-			-- Если слот пустой и еще не создан AddItem
 			if not addItemCreated then
 				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
 				v68.Visible = true
 				v68.Name = "AddItem"
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
-
-				-- Привязка кнопки для добавления элемента
 				Wrap(v68, "DepthButton"):start({
 					["mouse_button1_click"] = function()
 						local v4 = load("UIManager").apps.BackpackApp:pick_item({
@@ -617,41 +613,33 @@ local function build_slots(SlotsFrame)
 							end,
 						})
 						if v4.unique then
-							-- Когда уникальный элемент выбран, записываем его в слот
 							Offer.Offers.My.Offer[slotNumber].unique = v4.unique
-
-							-- Перерисовываем все слоты
 							build_slots(SlotsFrame)
 						end
 					end,
 				})
-
 				addItemCreated = true
 				addItemSlot = v68
-				nextSlot = v68  -- Сохраняем слот для AddItem
+				nextSlot = v68
 			else
-				-- Если AddItem уже был создан, создаем новый пустой слот
 				v68 = SlotsFrame.SlotTemplate:Clone()
 				v68.Visible = true
 				v68.Name = "Slot" .. Index
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
 				v68.AddItem:Destroy()
-				v68.ImageTransparency = 0.5  -- Сделать слот полупрозрачным
+				v68.ImageTransparency = 0.5
 			end
 		end
 	end
-
-	-- Обновляем прозрачность всех слотов, чтобы отобразить правильное состояние
-	for _, Data in pairs(Offer.Offers.My.Offer) do
-		local slot = SlotsFrame:FindFirstChild("Slot" .. _)
-		if slot then
-			if Data.unique ~= "" then
-				slot.ImageTransparency = 0  -- Если уникальный элемент, слот видимый
-			else
-				slot.ImageTransparency = 0.5  -- Если пустой, слот полупрозрачный
-			end
-		end
+	for Index, Data in pairs(Offer.Offers.Partner.Offer) do
+		local v68 = SlotsFrame.SlotTemplate:Clone()
+		v68.Visible = true
+		v68.Name = "Slot" .. Index
+		v68.LayoutOrder = Index
+		v68.Parent = SlotsFrame.Parent.Parent.PartnerOffer.Slots
+		v68.AddItem:Destroy()
+		v68.ImageTransparency = 0.5
 	end
 end
 
@@ -748,7 +736,6 @@ local function StartTrade()
 	NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
 
 	build_slots(NegotiationFrame.Body.MyOffer.Slots, true)
-	build_slots(NegotiationFrame.Body.PartnerOffer.Slots, false)
 
 	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
