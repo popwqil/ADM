@@ -565,7 +565,7 @@ local function build_slots(SlotsFrame)
 	-- Очищаем все слоты перед новым построением
 	for _, slot in ipairs(SlotsFrame:GetChildren()) do
 		if slot:IsA("ImageButton") then
-			if not slot.name == "SlotTemplate" then
+			if slot.name ~= "SlotTemplate" then
 				slot:Destroy()
 			end
 		end
