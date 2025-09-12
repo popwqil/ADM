@@ -649,11 +649,11 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			if v:IsA("ImageLabel") then
 				v.Visible = false
 			end
-			v.flyable.Visible = PD.properties.flyable
-			v.rideable.Visible = PD.properties.rideable
-			v.mega_neon.Visible = PD.properties.mega_neon
-			v.neon.Visible = PD.properties.neon
 		end
+		Cloned.flyable.Visible = PD.properties.flyable
+		Cloned.rideable.Visible = PD.properties.rideable
+		Cloned.mega_neon.Visible = PD.properties.mega_neon
+		Cloned.neon.Visible = PD.properties.neon
 		
 		local ImagePetDataBase
 		for i,v in pairs(petDatabase) do
@@ -665,7 +665,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		local ItemImageTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.ItemImageTemplate
 		local Cloned2 = ItemImageTemplate:Clone()
 		Cloned2.Parent = v69
-			Cloned2.Image = ImagePetDataBase
+		Cloned2.Image = ImagePetDataBase
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
