@@ -19,7 +19,7 @@ local TradeApp = require(ReplicatedStorage.ClientModules.Core.UIManager.Apps.Tra
 local BackpackApp = require(ReplicatedStorage.ClientModules.Core.UIManager.Apps.BackpackApp.BackpackApp)
 local InventoryDB = require(ReplicatedStorage.ClientDB.Inventory.InventoryDB)
 local petDatabase = require(ReplicatedStorage.ClientDB.Inventory.InventoryDB).pets
-local getData = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data
+local getData = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()
 
 local RouterClient = load("RouterClient")
 local ColorThemeManager = load("ColorThemeManager")
@@ -634,9 +634,8 @@ function build_slot(p_u_66, Index, first_empty_slot)
 	if pet_in_slot then
 		v69.ImageTransparency = 0
 		
-		--[[
 		local PD
-		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
+		for PetUnique, PetData in pairs(getData[LocalPlayer.Name].inventory.pets) do
 			if PetData.unique == pet_in_slot then
 				PD = PetData
 			end
@@ -670,7 +669,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		local Cloned2 = ItemImageTemplate:Clone()
 		Cloned2.Parent = v69
 		Cloned2.Image = ImagePetDataBase
-]]
+		
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
 			build_all_slots(p_u_66)
