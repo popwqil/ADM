@@ -640,7 +640,9 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				PD = PetData
 			end
 		end
+
 		
+		--[[
 		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
 		local Cloned = TagDisplayTemplate:Clone()
 		Cloned.Parent = v69
@@ -648,6 +650,13 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			v.Visible = false
 			v.Visible = PD.properties[v.Name]
 		end
+		]]
+		
+		load("UIManager").wrap(v69, "ItemDataTagDisplay"):start({
+			["fixed_property_size"] = load("PlatformM").get_platform() == "phone" and 18 or 20,
+			["item_data"] = PD.properties,
+			["wearing"] = false
+		})
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
