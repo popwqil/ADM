@@ -608,7 +608,6 @@ local function build_slots(SlotsFrame)
 						print("Added item to Offer: " .. v4.unique)
 					end
 				end,
-				["shine"] = true
 			})
 		end
 	end
