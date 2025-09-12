@@ -556,10 +556,29 @@ function clear_slots(p81)
 	end
 end
 
+function compact_pets()
+	-- Создаем новую таблицу без пропусков
+	local compacted = {}
+	for i = 1, Offer.Offers.My.num_slots do
+		if Offer.Offers.My.shown_pets[i] then
+			table.insert(compacted, Offer.Offers.My.shown_pets[i])
+		end
+	end
+
+	-- Очищаем старую таблицу и заполняем сжатой версией
+	Offer.Offers.My.shown_pets = {}
+	for i, pet_unique in ipairs(compacted) do
+		Offer.Offers.My.shown_pets[i] = pet_unique
+	end
+end
+
 function build_all_slots(p_u_42)
+	-- Сначала уплотняем питомцев (убираем пропуски)
+	compact_pets()
+
 	clear_slots(p_u_42)
 
-	-- Находим первый свободный слот
+	-- Находим первый свободный слот (теперь это будет сразу после последнего питомца)
 	local first_empty_slot = nil
 	for i = 1, Offer.Offers.My.num_slots do
 		if not Offer.Offers.My.shown_pets[i] then
