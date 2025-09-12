@@ -671,10 +671,10 @@ local function StartTrade()
 	local AcceptButtonNegotiationFrame = NegotiationFrame.Body.Accept
 	AcceptWrapButton = Wrap(AcceptButtonNegotiationFrame, "DepthButton"):start({
 		["mouse_button1_click"] = function()
-			if Offer.negotiated then
-				Offer.negotiated = false
+			if Offer.Offers.My.accepted_negotiation then
+				Offer.Offers.My.accepted_negotiation = false
 			else
-				Offer.negotiated = true
+				Offer.Offers.My.accepted_negotiation = true
 			end
 			refresh_all()
 		end
@@ -716,14 +716,6 @@ TradeTab:Checkbox({
 		end
 	end,
 })
-
-TradeTab:Button({
-	Text = "Make fake trade",
-	Callback = function()
-		StartTrade()
-	end
-})
-
 TradeTab:Button({
 	Text = "Make fake trade",
 	Callback = function()
