@@ -658,7 +658,9 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		Cloned.Size = UDim2.new(v31.X.Scale, v31.X.Offset * v30, v31.Y.Scale, fixed_property_size)
 		local v32 = Cloned.Position
 		Cloned.Position = UDim2.new(v32.X.Scale, v32.X.Offset * v30, v32.Y.Scale, v32.Y.Offset * v30)
-		Cloned.UIGridLayout.CellSize = UDim2.fromOffset(fixed_property_size, fixed_property_size)
+		pcall(function()
+			Cloned.UIGridLayout.CellSize = UDim2.fromOffset(fixed_property_size, fixed_property_size)
+		end)
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
