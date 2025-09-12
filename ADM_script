@@ -636,6 +636,9 @@ function build_slot(p_u_66, Index, first_empty_slot)
 
 		local pe
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
+			print(PetUnique)
+			dump(PetUnique)
+			dump(PetData)
 			if PetData.unique == pet_in_slot.unique then
 				pe = PetData
 				dump(pe)
