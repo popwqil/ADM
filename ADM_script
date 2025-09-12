@@ -531,15 +531,15 @@ local Offer = {
 			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {
-				[1] = {["states"] = "", ["unique"] = ""},
-				[2] = {["states"] = "", ["unique"] = ""},
-				[3] = {["states"] = "", ["unique"] = ""},
-				[4] = {["states"] = "", ["unique"] = ""},
-				[5] = {["states"] = "", ["unique"] = ""},
-				[6] = {["states"] = "", ["unique"] = ""},
-				[7] = {["states"] = "", ["unique"] = ""},
-				[8] = {["states"] = "", ["unique"] = ""},
-				[9] = {["states"] = "", ["unique"] = ""}
+				[1] = {["unique"] = ""},
+				[2] = {["unique"] = ""},
+				[3] = {["unique"] = ""},
+				[4] = {["unique"] = ""},
+				[5] = {["unique"] = ""},
+				[6] = {["unique"] = ""},
+				[7] = {["unique"] = ""},
+				[8] = {["unique"] = ""},
+				[9] = {["unique"] = ""}
 			}
 		},
 		Partner = {
@@ -547,15 +547,15 @@ local Offer = {
 			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {
-				[1] = {["states"] = "", ["unique"] = ""},
-				[2] = {["states"] = "", ["unique"] = ""},
-				[3] = {["states"] = "", ["unique"] = ""},
-				[4] = {["states"] = "", ["unique"] = ""},
-				[5] = {["states"] = "", ["unique"] = ""},
-				[6] = {["states"] = "", ["unique"] = ""},
-				[7] = {["states"] = "", ["unique"] = ""},
-				[8] = {["states"] = "", ["unique"] = ""},
-				[9] = {["states"] = "", ["unique"] = ""}
+				[1] = {["unique"] = ""},
+				[2] = {["unique"] = ""},
+				[3] = {["unique"] = ""},
+				[4] = {["unique"] = ""},
+				[5] = {["unique"] = ""},
+				[6] = {["unique"] = ""},
+				[7] = {["unique"] = ""},
+				[8] = {["unique"] = ""},
+				[9] = {["unique"] = ""}
 			}
 		},
 	},
@@ -570,8 +570,6 @@ local function build_slots(SlotsFrame)
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		local v68
-
-		-- Если слот заполнен (есть уникальные данные)
 		if Data.unique ~= "" then  
 			v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
@@ -579,19 +577,15 @@ local function build_slots(SlotsFrame)
 			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
 			v68.AddItem:Destroy()
-			v68.ImageTransparency = 0  -- Сделать слот видимым
-
+			v68.ImageTransparency = 0
 			lastIndexWithData = Index
 		else
-			-- Если слот пустой и еще не создан AddItem
 			if not addItemCreated then
 				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
 				v68.Visible = true
 				v68.Name = "AddItem"
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
-
-				-- Привязка кнопки для добавления элемента
 				Wrap(v68, "DepthButton"):start({
 					["mouse_button1_click"] = function()
 						local v4 = load("UIManager").apps.BackpackApp:pick_item({
@@ -600,28 +594,22 @@ local function build_slots(SlotsFrame)
 							end,
 						})
 						if v4.unique then
-							-- Когда уникальный элемент выбран, записываем его в слот
 							Offer.Offers.My.Offer[slotNumber].unique = v4.unique
-
-							-- Обновить слот с уникальным элементом
-							v68.ImageTransparency = 0  -- Сделать его видимым
-							-- Обновляем все слоты и их прозрачность
 							build_slots(SlotsFrame)
 						end
 					end,
 				})
 				addItemCreated = true
 				addItemSlot = v68
-				nextSlot = v68  -- Сохраняем слот для AddItem
+				nextSlot = v68
 			else
-				-- Если AddItem уже был создан, создаем новый пустой слот
 				v68 = SlotsFrame.SlotTemplate:Clone()
 				v68.Visible = true
 				v68.Name = "Slot" .. Index
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
 				v68.AddItem:Destroy()
-				v68.ImageTransparency = 0.5  -- Сделать слот полупрозрачным
+				v68.ImageTransparency = 0.5
 			end
 		end
 	end
@@ -732,13 +720,33 @@ local function StartTrade()
 						accepted_negotiation = false,
 						accepted_confirmation = false,
 						shown_pets = {},
-						Offer = {}
+						Offer = {
+							[1] = {["unique"] = ""},
+							[2] = {["unique"] = ""},
+							[3] = {["unique"] = ""},
+							[4] = {["unique"] = ""},
+							[5] = {["unique"] = ""},
+							[6] = {["unique"] = ""},
+							[7] = {["unique"] = ""},
+							[8] = {["unique"] = ""},
+							[9] = {["unique"] = ""}
+						}
 					},
 					Partner = {
 						accepted_negotiation = false,
 						accepted_confirmation = false,
 						shown_pets = {},
-						Offer = {}
+						Offer = {
+							[1] = {["unique"] = ""},
+							[2] = {["unique"] = ""},
+							[3] = {["unique"] = ""},
+							[4] = {["unique"] = ""},
+							[5] = {["unique"] = ""},
+							[6] = {["unique"] = ""},
+							[7] = {["unique"] = ""},
+							[8] = {["unique"] = ""},
+							[9] = {["unique"] = ""}
+						}
 					},
 				},
 			}
