@@ -561,18 +561,20 @@ local Offer = {
 	},
 }
 
-local function build_slots(SlotsFrame, AddItem)
+local function build_slots(SlotsFrame)
 	local lastIndexWithData = nil
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
+		print("Index: " .. Index)  -- Логируем индекс для отладки
 		if Data ~= nil then
 			local v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
 			v68.Name = "Slot" .. Index
 			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
-			
-			
+
+			-- Логируем создание слота с данными
+			print("Created Slot " .. Index)
 			lastIndexWithData = Index
 		else
 			local v68
@@ -582,13 +584,18 @@ local function build_slots(SlotsFrame, AddItem)
 				v68.Name = "AddItem"
 				v68.LayoutOrder = 1
 				v68.Parent = SlotsFrame
+
+				print("Created AddItem at position 1")
 			else
 				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
 				v68.Visible = true
 				v68.Name = "AddItem"
 				v68.LayoutOrder = lastIndexWithData + 1
 				v68.Parent = SlotsFrame
+
+				print("Created AddItem after Slot " .. lastIndexWithData)
 			end
+
 			Wrap(v68, "DepthButton"):start({
 				["mouse_button1_click"] = function()
 					local v4 = load("UIManager").apps.BackpackApp:pick_item({
@@ -598,7 +605,7 @@ local function build_slots(SlotsFrame, AddItem)
 					})
 					if v4.unique then
 						Offer.Offers.My.Offer[v4.unique] = slotNumber
-						print(v4.unique)
+						print("Added item to Offer: " .. v4.unique)
 					end
 				end,
 				["shine"] = true
