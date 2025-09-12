@@ -523,6 +523,25 @@ UpdateTradePlayers()
 TradeTab:Separator({Text = "Fake Trade"})
 
 
+local function dump(tbl, indent, result)
+	indent = indent or ""
+	result = result or ""
+	if type(tbl) ~= "table" then
+		result = result .. indent .. tostring(tbl) .. "\n"
+		return result
+	end
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			result = result .. indent .. tostring(k) .. " = {\n"
+			result = dump(v, indent .. "  ", result)
+			result = result .. indent .. "}\n"
+		else
+			result = result .. indent .. tostring(k) .. " = " .. tostring(v) .. "\n"
+		end
+	end
+	return result
+end
+
 local v_u_12 = {
 	["Normal"] = 1,
 	["Removed"] = 2,
@@ -544,9 +563,7 @@ local Offer = {
 		},
 	},
 }
-
 function clear_slots(p81)
-	-- Очищаем все существующие слоты
 	if p81 and p81.instance and p81.instance.Slots then
 		for _, child in pairs(p81.instance.Slots:GetChildren()) do
 			if child.Name:match("^Slot%d+$") or child.Name == "AddItem" then
@@ -555,30 +572,21 @@ function clear_slots(p81)
 		end
 	end
 end
-
 function compact_pets()
-	-- Создаем новую таблицу без пропусков
 	local compacted = {}
 	for i = 1, Offer.Offers.My.num_slots do
 		if Offer.Offers.My.shown_pets[i] then
 			table.insert(compacted, Offer.Offers.My.shown_pets[i])
 		end
 	end
-
-	-- Очищаем старую таблицу и заполняем сжатой версией
 	Offer.Offers.My.shown_pets = {}
 	for i, pet_unique in ipairs(compacted) do
 		Offer.Offers.My.shown_pets[i] = pet_unique
 	end
 end
-
 function build_all_slots(p_u_42)
-	-- Сначала уплотняем питомцев (убираем пропуски)
 	compact_pets()
-
 	clear_slots(p_u_42)
-
-	-- Находим первый свободный слот (теперь это будет сразу после последнего питомца)
 	local first_empty_slot = nil
 	for i = 1, Offer.Offers.My.num_slots do
 		if not Offer.Offers.My.shown_pets[i] then
@@ -586,18 +594,12 @@ function build_all_slots(p_u_42)
 			break
 		end
 	end
-
-	-- Строим все слоты
 	for v43 = 1, Offer.Offers.My.num_slots do
 		local v44 = build_slot(p_u_42, v43, first_empty_slot)
 	end
 end
-
 function build_slot(p_u_66, Index, first_empty_slot)
-	-- Проверяем есть ли питомец в этом слоте
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
-
-	-- Если это первый свободный слот и нет питомца - создаем AddItem
 	if Index == first_empty_slot and not pet_in_slot then
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
@@ -614,9 +616,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 					end
 				})
 				if v161 then
-					-- Добавляем unique питомца в первый свободный слот
 					Offer.Offers.My.shown_pets[Index] = v161.unique
-					-- Перестраиваем все слоты
 					build_all_slots(p_u_66)
 				end
 			end,
@@ -625,7 +625,6 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		return v68
 	end
 
-	-- Создаем обычный слот (SlotTemplate)
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
@@ -633,35 +632,27 @@ function build_slot(p_u_66, Index, first_empty_slot)
 	v69.AddItem:Destroy()
 	v69.Parent = p_u_66.instance.Slots
 
-	-- Устанавливаем внешний вид слота
 	if pet_in_slot then
-		-- Слот с питомцем - непрозрачный
 		v69.ImageTransparency = 0
-		--init_slot_item_image(v69, pet_in_slot)
-
-		-- Добавляем возможность удаления питомца по клику
+		
+		local pe
+		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
+			if PetData.unique == pet_in_slot.unique then
+				pe = PetData
+				dump(pe)
+			end
+		end
+		
 		v69.Activated:Connect(function()
-			-- Удаляем питомца из слота
 			Offer.Offers.My.shown_pets[Index] = nil
-			-- Перестраиваем все слоты
 			build_all_slots(p_u_66)
 		end)
 	else
-		-- Пустой слот - полупрозрачный
 		v69.ImageTransparency = 0.5
 	end
 
 	return v69
 end
-
-function init_slot_item_image(Frame, ItemData)
-	local v77 = load("UIManager").wrap(Frame, "ItemDataImage"):start({
-		["item_data"] = ItemData,
-		["size"] = "icon"
-	})
-	v77.instance.ZIndex = 1
-end
-
 
 local function OpenProfile(Id)
 	load("UIManager").apps.PlayerProfileApp:open_player_profile_for_user_id(Id)
@@ -690,13 +681,13 @@ local function StartTrade()
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0.3
 
 				AcceptWrapButton:set_state("selected")
-				AcceptWrapButton.Face.TextLabel.Text = "Unaccept"
+				NegotiationFrame.Body.Accept.Face.TextLabel.Text = "Unaccept"
 			else
 				NegotiationFrame.Body.MyOffer.Accepted.Visible = false
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0
 
 				AcceptWrapButton:set_state("normal")
-				AcceptWrapButton.Face.TextLabel.Text = "Accept"
+				NegotiationFrame.Body.Accept.Face.TextLabel.Text = "Accept"
 			end
 			
 			if Offer.Offers.Partner.accepted_negotiation then
