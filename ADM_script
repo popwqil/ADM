@@ -616,10 +616,10 @@ local function StartTrade()
 	NegotiationFrame.Header.YouFrame.Icon.Visible = false
 
 	FakeTradeApp.Frame.NegotiationFrame.Header.PartnerFrame.ProfileIcon.Visible = true
-	Negotiation_partner_name_label.Text = FakeTradePartner
+	Negotiation_partner_name_label.Text = FakeTradePartner:lower()
 	Negotiation_partner_name_label.Size = UDim2.new(0, UDim2New, 1, 0)
 	Negotiation_partner_name_label.Size = UDim2.new(0, math.min(UDim2New, Negotiation_partner_name_label.TextBounds.X), 1, 0)
-	Confirmation_partner_name_label.Text = FakeTradePartner
+	Confirmation_partner_name_label.Text = FakeTradePartner:lower()
 	NegotiationFrame.Header.PartnerFrame.Icon.Visible = false
 
 	local FriendValue = AdoptMeHelper.FakeTrades.Friend
@@ -675,7 +675,7 @@ end
 TradeTab:InputText({
 	PlaceHolder = "Any name",
 	Callback = function(self, text)
-		AdoptMeHelper.FakeTrades.PartnerName = text:lower()
+		AdoptMeHelper.FakeTrades.PartnerName = text
 	end
 })
 
