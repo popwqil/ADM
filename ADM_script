@@ -524,6 +524,7 @@ TradeTab:Separator({Text = "Fake Trade"})
 
 local Offer = {
 	trade_state = "negotiation",
+	trade = false,
 	Offers = {
 		My = {
 			accepted_negotiation = false,
@@ -686,7 +687,7 @@ local function StartTrade()
 			OpenProfile(IdFromName)
 		end
 	})
-
+	Offer.trade = true
 end
 
 
@@ -710,7 +711,9 @@ TradeTab:Checkbox({
 	Value = false,
 	Callback = function(self, Value)
 		Offer.Offers.Partner.accepted_negotiation = Value
-		refresh_all()
+		if Offer.trade then
+			refresh_all()
+		end
 	end,
 })
 
