@@ -522,6 +522,7 @@ UpdateTradePlayers()
 
 TradeTab:Separator({Text = "Fake Trade"})
 
+
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
@@ -529,122 +530,13 @@ local Offer = {
 		My = {
 			accepted_negotiation = false,
 			accepted_confirmation = false,
-			shown_pets = {},
-			Offer = {
-				[1] = {["unique"] = ""},
-				[2] = {["unique"] = ""},
-				[3] = {["unique"] = ""},
-				[4] = {["unique"] = ""},
-				[5] = {["unique"] = ""},
-				[6] = {["unique"] = ""},
-				[7] = {["unique"] = ""},
-				[8] = {["unique"] = ""},
-				[9] = {["unique"] = ""}
-			}
 		},
 		Partner = {
 			accepted_negotiation = false,
 			accepted_confirmation = false,
-			shown_pets = {},
-			Offer = {
-				[1] = {["unique"] = ""},
-				[2] = {["unique"] = ""},
-				[3] = {["unique"] = ""},
-				[4] = {["unique"] = ""},
-				[5] = {["unique"] = ""},
-				[6] = {["unique"] = ""},
-				[7] = {["unique"] = ""},
-				[8] = {["unique"] = ""},
-				[9] = {["unique"] = ""}
-			}
 		},
 	},
 }
-
-local function reset_offer(SlotsFrame)
-	for i = 1, 9 do
-		Offer.Offers.My.Offer[i].unique = ""
-		Offer.Offers.Partner.Offer[i].unique = ""
-	end
-
-	for _, slot in ipairs(SlotsFrame:GetChildren()) do
-		if slot:IsA("ImageButton") then
-			if slot.Name ~= "SlotTemplate" then
-				slot:Destroy()
-			end
-		end
-	end
-end
-
-function build_slots(SlotsFrame)
-	reset_offer(SlotsFrame)
-
-	local addItemCreated = false
-	local lastIndexWithData = nil
-	local addItemSlot = nil
-	local nextSlot = nil
-	for Index, Data in pairs(Offer.Offers.My.Offer) do
-		local slotNumber = Index
-		local v68
-		if Data.unique ~= "" then  
-			v68 = SlotsFrame.SlotTemplate:Clone()
-			v68.Visible = true
-			v68.Name = "Slot" .. Index
-			v68.LayoutOrder = Index
-			v68.Parent = SlotsFrame
-			v68.AddItem:Destroy()
-			v68.ImageTransparency = 0
-
-			lastIndexWithData = Index
-		else
-			if not addItemCreated then
-				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
-				v68.Visible = true
-				v68.Name = "AddItem"
-				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
-				v68.Parent = SlotsFrame
-				Wrap(v68, "DepthButton"):start({
-					["mouse_button1_click"] = function()
-						local v4 = load("UIManager").apps.BackpackApp:pick_item({
-							["allow_callback"] = function(_)
-								return true
-							end,
-						})
-						if v4.unique then
-							Offer.Offers.My.Offer[slotNumber].unique = v4.unique
-							build_slots(SlotsFrame)
-						end
-					end,
-				})
-				addItemCreated = true
-				addItemSlot = v68
-				nextSlot = v68
-			else
-				v68 = SlotsFrame.SlotTemplate:Clone()
-				v68.Visible = true
-				v68.Name = "Slot" .. Index
-				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
-				v68.Parent = SlotsFrame
-				v68.AddItem:Destroy()
-				v68.ImageTransparency = 0.5
-			end
-		end
-	end
-	for Index, Data in pairs(Offer.Offers.Partner.Offer) do
-		local v68 = SlotsFrame.SlotTemplate:Clone()
-		v68.Visible = true
-		v68.Name = "Slot" .. Index
-		v68.LayoutOrder = Index
-		v68.Parent = SlotsFrame.Parent.Parent.PartnerOffer.Slots
-		v68.AddItem:Destroy()
-		v68.ImageTransparency = 0.5
-	end
-end
-
-
-
-
-
 
 
 
@@ -677,13 +569,13 @@ local function StartTrade()
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0.3
 
 				AcceptWrapButton:set_state("selected")
-				AcceptWrapButton.Text = "Unaccept"
+				AcceptWrapButton.Face.TextLabel.Text = "Unaccept"
 			else
 				NegotiationFrame.Body.MyOffer.Accepted.Visible = false
 				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0
 
 				AcceptWrapButton:set_state("normal")
-				AcceptWrapButton.Text = "Accept"
+				AcceptWrapButton.Face.TextLabel.Text = "Accept"
 			end
 			
 			if Offer.Offers.Partner.accepted_negotiation then
@@ -733,7 +625,17 @@ local function StartTrade()
 	NegotiationFrame.Body.PartnerOffer.Accepted.Visible = false
 	NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
 
-	build_slots(NegotiationFrame.Body.MyOffer.Slots, true)
+
+	load("UIManager").wrap(NegotiationFrame.Body.MyOffer.Slots, "OfferPane"):start({
+		["num_condensed_slots"] = 4,
+		["num_slots"] = 18,
+		["should_tween_mobile_layout"] = true,
+		--["mobile_layout_properties"] = v_u_35,
+		["can_add_and_remove_items"] = true,
+		--["app"] = p_u_337,
+		--["optional_xbox_tablet_parent_override"] = p_u_337.instance.Frame,
+		["force_display_post_trade_values"] = false
+	})
 
 	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
