@@ -528,7 +528,6 @@ local v_u_12 = {
 	["Removed"] = 2,
 	["Changed"] = 3
 }
-
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
@@ -547,21 +546,20 @@ local Offer = {
 }
 
 function clear_slots(p81)
-
-end
-
-function build_all_slots(p_u_42)
-	clear_slots()
-	for v43 = 1, Offer.Offers.My.num_slots do
-		local v44 = build_slot(p_u_42, v43)
+	-- Очищаем все существующие слоты
+	if p81 and p81.instance and p81.instance.Slots then
+		for _, child in pairs(p81.instance.Slots:GetChildren()) do
+			if child.Name:match("^Slot%d+$") or child.Name == "AddItem" then
+				child:Destroy()
+			end
+		end
 	end
 end
 
-function build_slot(p_u_66, Index)
-	-- Проверяем есть ли питомец в этом слоте
-	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
+function build_all_slots(p_u_42)
+	clear_slots(p_u_42)
 
-	-- Находим первый свободный слот для AddItem
+	-- Находим первый свободный слот
 	local first_empty_slot = nil
 	for i = 1, Offer.Offers.My.num_slots do
 		if not Offer.Offers.My.shown_pets[i] then
@@ -570,15 +568,17 @@ function build_slot(p_u_66, Index)
 		end
 	end
 
-	-- Всегда создаем SlotTemplate
-	local v69 = p_u_66.slot_template:Clone()
-	v69.Visible = true
-	v69.Name = "Slot" .. Index
-	v69.LayoutOrder = Index
-	v69.AddItem:Destroy()
-	v69.Parent = p_u_66.instance.Slots
+	-- Строим все слоты
+	for v43 = 1, Offer.Offers.My.num_slots do
+		local v44 = build_slot(p_u_42, v43, first_empty_slot)
+	end
+end
 
-	-- Если это первый свободный слот И нет питомца, создаем AddItem поверх
+function build_slot(p_u_66, Index, first_empty_slot)
+	-- Проверяем есть ли питомец в этом слоте
+	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
+
+	-- Если это первый свободный слот и нет питомца - создаем AddItem
 	if Index == first_empty_slot and not pet_in_slot then
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
@@ -594,9 +594,8 @@ function build_slot(p_u_66, Index)
 						return true;
 					end
 				})
-
 				if v161 then
-					-- Добавляем unique питомца в этот слот
+					-- Добавляем unique питомца в первый свободный слот
 					Offer.Offers.My.shown_pets[Index] = v161.unique
 					-- Перестраиваем все слоты
 					build_all_slots(p_u_66)
@@ -604,14 +603,32 @@ function build_slot(p_u_66, Index)
 			end,
 			["shine"] = true
 		})
+		return v68
 	end
 
-	-- Устанавливаем прозрачность и изображение для SlotTemplate
+	-- Создаем обычный слот (SlotTemplate)
+	local v69 = p_u_66.slot_template:Clone()
+	v69.Visible = true
+	v69.Name = "Slot" .. Index
+	v69.LayoutOrder = Index
+	v69.AddItem:Destroy()
+	v69.Parent = p_u_66.instance.Slots
+
+	-- Устанавливаем внешний вид слота
 	if pet_in_slot then
+		-- Слот с питомцем - непрозрачный
 		v69.ImageTransparency = 0
-		-- Инициализируем изображение питомца
 		init_slot_item_image(v69, pet_in_slot)
+
+		-- Добавляем возможность удаления питомца по клику
+		v69.Activated:Connect(function()
+			-- Удаляем питомца из слота
+			Offer.Offers.My.shown_pets[Index] = nil
+			-- Перестраиваем все слоты
+			build_all_slots(p_u_66)
+		end)
 	else
+		-- Пустой слот - полупрозрачный
 		v69.ImageTransparency = 0.5
 	end
 
