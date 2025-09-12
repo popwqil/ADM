@@ -580,6 +580,7 @@ local function build_slots(SlotsFrame)
 			v68.Parent = SlotsFrame
 			v68.AddItem:Destroy()
 			v68.ImageTransparency = 0  -- Сделать слот видимым
+
 			lastIndexWithData = Index
 		else
 			-- Если слот пустой и еще не создан AddItem
@@ -601,12 +602,11 @@ local function build_slots(SlotsFrame)
 						if v4.unique then
 							-- Когда уникальный элемент выбран, записываем его в слот
 							Offer.Offers.My.Offer[slotNumber].unique = v4.unique
+
 							-- Обновить слот с уникальным элементом
 							v68.ImageTransparency = 0  -- Сделать его видимым
-							if nextSlot then
-								-- Переместить AddItem в следующий слот
-								nextSlot = nil
-							end
+							-- Обновляем все слоты и их прозрачность
+							build_slots(SlotsFrame)
 						end
 					end,
 				})
@@ -626,6 +626,7 @@ local function build_slots(SlotsFrame)
 		end
 	end
 end
+
 
 
 
