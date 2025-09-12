@@ -523,11 +523,18 @@ UpdateTradePlayers()
 TradeTab:Separator({Text = "Fake Trade"})
 
 
+local v_u_12 = {
+	["Normal"] = 1,
+	["Removed"] = 2,
+	["Changed"] = 3
+}
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
 	Offers = {
 		My = {
+			shown_pets = {},
+			num_slots = 9,
 			accepted_negotiation = false,
 			accepted_confirmation = false,
 		},
@@ -538,8 +545,67 @@ local Offer = {
 	},
 }
 
-
-
+function clear_slots(p81)
+	
+end
+function build_all_slots(p_u_42)
+	clear_slots()
+	for v43 = 1, 9 do
+		local v44 = build_slot(p_u_42, v43)
+	end
+end
+function should_slot_be_add_item_button_My_Offer(p63)
+	local v64 = Offer.Offers.My.num_slots
+	local v65 = false
+	if p63 == #Offer.Offers.My.shown_items + 1 then
+		v65 = #Offer.Offers.My.shown_items < v64 and true or v65
+	end
+	if Offer.Offers.My.accepted_negotiation then
+		v65 = false
+	end
+	return v65
+end
+function build_slot(p_u_66, Index)
+	if should_slot_be_add_item_button_My_Offer(Index) then
+		local v68 = p_u_66.slot_template.AddItem:Clone()
+		v68.Visible = true
+		v68.Name = "AddItem"
+		v68.LayoutOrder = Index
+		v68.Parent = p_u_66.instance.Slots
+		local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
+			["mouse_button1_click"] = function()
+				
+			end,
+			["shine"] = true
+		})
+		return v68
+	end
+	local v69 = p_u_66.slot_template:Clone()
+	v69.Visible = true
+	v69.Name = "Slot" .. Index
+	v69.LayoutOrder = Index
+	v69.AddItem:Destroy()
+	v69.Parent = p_u_66.instance.Slots
+	local v70 = Offer.shown_items[Index]
+	if v70 then
+		v69.ImageTransparency = 0
+		local v_u_71 = v70.item
+		
+		v69.Activated:Connect(function()
+			
+		end)
+	else
+		v69.ImageTransparency = 0.5
+	end
+	return v69
+end
+function init_slot_item_image(Frame, ItemData)
+	local v77 = load("UIManager").wrap(Frame, "ItemDataImage"):start({
+		["item_data"] = ItemData,
+		["size"] = "icon"
+	})
+	v77.instance.ZIndex = 1
+end
 
 
 local function OpenProfile(Id)
@@ -624,61 +690,18 @@ local function StartTrade()
 
 	NegotiationFrame.Body.PartnerOffer.Accepted.Visible = false
 	NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
-
-
-	load("UIManager").wrap(NegotiationFrame.Body.MyOffer, "OfferPane"):start({
-		["num_condensed_slots"] = 4,
-		["num_slots"] = 18,
-		["should_tween_mobile_layout"] = true,
-		--["mobile_layout_properties"] = v_u_35,
-		["can_add_and_remove_items"] = true,
-		--["app"] = p_u_337,
-		--["optional_xbox_tablet_parent_override"] = p_u_337.instance.Frame,
-		["force_display_post_trade_values"] = false
+	
+	build_all_slots({
+		["instance"] = {
+			["Slots"] = NegotiationFrame.Body.MyOffer.Slots
+		}
+		["slot_template"] = NegotiationFrame.Body.MyOffer.Slots.SlotTemplate
 	})
-
+	
 	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
 		["mouse_button1_click"] = function()
 			FakeTradeApp:Destroy()
-			local Offer = {
-				trade_state = "negotiation",
-				trade_make = false,
-				Offers = {
-					My = {
-						accepted_negotiation = false,
-						accepted_confirmation = false,
-						shown_pets = {},
-						Offer = {
-							[1] = {["unique"] = ""},
-							[2] = {["unique"] = ""},
-							[3] = {["unique"] = ""},
-							[4] = {["unique"] = ""},
-							[5] = {["unique"] = ""},
-							[6] = {["unique"] = ""},
-							[7] = {["unique"] = ""},
-							[8] = {["unique"] = ""},
-							[9] = {["unique"] = ""}
-						}
-					},
-					Partner = {
-						accepted_negotiation = false,
-						accepted_confirmation = false,
-						shown_pets = {},
-						Offer = {
-							[1] = {["unique"] = ""},
-							[2] = {["unique"] = ""},
-							[3] = {["unique"] = ""},
-							[4] = {["unique"] = ""},
-							[5] = {["unique"] = ""},
-							[6] = {["unique"] = ""},
-							[7] = {["unique"] = ""},
-							[8] = {["unique"] = ""},
-							[9] = {["unique"] = ""}
-						}
-					},
-				},
-			}
 		end
 	})
 
