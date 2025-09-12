@@ -662,15 +662,17 @@ local function StartTrade()
 			refresh_all()
 		end
 	})
-
-	NegotiationFrame.Header.ProfileButtonPartner.Activated:Connect(function()
-		if AdoptMeHelper.FakeTrades.PartnerName ~= nil then
+	
+	local ProfileButtonPartner = NegotiationFrame.Header.ProfileButtonPartner
+	Wrap(ProfileButtonPartner, "DepthButton"):start({
+		["mouse_button1_click"] = function()
 			local IdFromName = game.Players:GetUserIdFromNameAsync(AdoptMeHelper.FakeTrades.PartnerName)
 			OpenProfile(IdFromName)
 		end
-	end)
+	})
 
 end
+
 
 TradeTab:InputText({
 	PlaceHolder = "Any name",
