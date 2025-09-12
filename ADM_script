@@ -530,47 +530,82 @@ local Offer = {
 			accepted_negotiation = false,
 			accepted_confirmation = false,
 			shown_pets = {},
-			Offer = {}
+			Offer = {
+				[1] = nil,
+				[2] = nil,
+				[3] = nil,
+				[4] = nil,
+				[5] = nil,
+				[6] = nil,
+				[7] = nil,
+				[8] = nil,
+				[9] = nil
+			}
 		},
 		Partner = {
 			accepted_negotiation = false,
 			accepted_confirmation = false,
 			shown_pets = {},
-			Offer = {}
+			Offer = {
+				[1] = nil,
+				[2] = nil,
+				[3] = nil,
+				[4] = nil,
+				[5] = nil,
+				[6] = nil,
+				[7] = nil,
+				[8] = nil,
+				[9] = nil
+			}
 		},
 	},
 }
 
 local function build_slots(SlotsFrame, AddItem)
-	if AddItem then
-		local v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
-		v68.Visible = true
-		v68.Name = "AddItem"
-		v68.LayoutOrder = 1
-		v68.Parent = SlotsFrame
-		Wrap(v68, "DepthButton"):start({ 
-			["mouse_button1_click"] = function() 
-
-				local v4 = load("UIManager").apps.BackpackApp:pick_item({
-					["allow_callback"] = function(_)
-						return true
-					end,
-					["shine"] = true
-				})
-				
-				-- v4.unique
+	local lastIndexWithData = nil
+	for Index, Data in pairs(Offer.Offers.My.Offer) do
+		local slotNumber = Index
+		if Data ~= nil then
+			local v68 = SlotsFrame.SlotTemplate:Clone()
+			v68.Visible = true
+			v68.Name = "Slot" .. Index
+			v68.LayoutOrder = Index
+			v68.Parent = SlotsFrame
+			
+			SlotsFrame:_init_slot_item_image(v68, Data)
+			SlotsFrame:_init_slot_tag_display(v68, Data)
+			
+			lastIndexWithData = Index
+		else
+			local v68
+			if lastIndexWithData == nil then
+				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
+				v68.Visible = true
+				v68.Name = "AddItem"
+				v68.LayoutOrder = 1
+				v68.Parent = SlotsFrame
+			else
+				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
+				v68.Visible = true
+				v68.Name = "AddItem"
+				v68.LayoutOrder = lastIndexWithData + 1
+				v68.Parent = SlotsFrame
 			end
-		})
-	end
-
-	for i = 1, 9 do
-		local v69 = SlotsFrame.SlotTemplate:Clone()
-		v69.Visible = true
-		v69.ImageTransparency = 0.5
-		v69.Name = "Slot" .. i
-		v69.LayoutOrder = i + 1
-		v69.AddItem:Destroy()
-		v69.Parent = SlotsFrame
+			Wrap(v68, "DepthButton"):start({
+				["mouse_button1_click"] = function()
+					local v4 = load("UIManager").apps.BackpackApp:pick_item({
+						["allow_callback"] = function(_)
+							return true
+						end,
+					})
+					if v4.unique then
+						Offer.Offers.My.Offer[v4.unique] = slotNumber
+						print(v4.unique)
+					end
+				end,
+				["shine"] = true
+			})
+		end
 	end
 end
 
@@ -665,6 +700,24 @@ local function StartTrade()
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
 		["mouse_button1_click"] = function()
 			FakeTradeApp:Destroy()
+			local Offer = {
+				trade_state = "negotiation",
+				trade_make = false,
+				Offers = {
+					My = {
+						accepted_negotiation = false,
+						accepted_confirmation = false,
+						shown_pets = {},
+						Offer = {}
+					},
+					Partner = {
+						accepted_negotiation = false,
+						accepted_confirmation = false,
+						shown_pets = {},
+						Offer = {}
+					},
+				},
+			}
 		end
 	})
 
