@@ -694,7 +694,7 @@ local function StartTrade()
 	build_all_slots({
 		["instance"] = {
 			["Slots"] = NegotiationFrame.Body.MyOffer.Slots
-		}
+		},
 		["slot_template"] = NegotiationFrame.Body.MyOffer.Slots.SlotTemplate
 	})
 	
