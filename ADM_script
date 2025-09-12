@@ -554,32 +554,19 @@ function build_all_slots(p_u_42)
 		local v44 = build_slot(p_u_42, v43)
 	end
 end
-function should_slot_be_add_item_button_My_Offer(p63)
-	local v64 = Offer.Offers.My.num_slots
-	local v65 = false
-	if p63 == #Offer.Offers.My.shown_items + 1 then
-		v65 = #Offer.Offers.My.shown_items < v64 and true or v65
-	end
-	if Offer.Offers.My.accepted_negotiation then
-		v65 = false
-	end
-	return v65
-end
 function build_slot(p_u_66, Index)
-	if should_slot_be_add_item_button_My_Offer(Index) then
-		local v68 = p_u_66.slot_template.AddItem:Clone()
-		v68.Visible = true
-		v68.Name = "AddItem"
-		v68.LayoutOrder = Index
-		v68.Parent = p_u_66.instance.Slots
-		local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
-			["mouse_button1_click"] = function()
-				
-			end,
-			["shine"] = true
-		})
-		return v68
-	end
+	local v68 = p_u_66.slot_template.AddItem:Clone()
+	v68.Visible = true
+	v68.Name = "AddItem"
+	v68.LayoutOrder = Index
+	v68.Parent = p_u_66.instance.Slots
+	local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
+		["mouse_button1_click"] = function()
+
+		end,
+		["shine"] = true
+	})
+	
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
