@@ -618,7 +618,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 	if pet_in_slot then
 		-- Слот с питомцем - непрозрачный
 		v69.ImageTransparency = 0
-		init_slot_item_image(v69, pet_in_slot)
+		--init_slot_item_image(v69, pet_in_slot)
 
 		-- Добавляем возможность удаления питомца по клику
 		v69.Activated:Connect(function()
