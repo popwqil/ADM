@@ -522,26 +522,6 @@ UpdateTradePlayers()
 
 TradeTab:Separator({Text = "Fake Trade"})
 
-
-local function dump(tbl, indent, result)
-	indent = indent or ""
-	result = result or ""
-	if type(tbl) ~= "table" then
-		result = result .. indent .. tostring(tbl) .. "\n"
-		return result
-	end
-	for k, v in pairs(tbl) do
-		if type(v) == "table" then
-			result = result .. indent .. tostring(k) .. " = {\n"
-			result = dump(v, indent .. "  ", result)
-			result = result .. indent .. "}\n"
-		else
-			result = result .. indent .. tostring(k) .. " = " .. tostring(v) .. "\n"
-		end
-	end
-	return result
-end
-
 local v_u_12 = {
 	["Normal"] = 1,
 	["Removed"] = 2,
@@ -598,9 +578,28 @@ function build_all_slots(p_u_42)
 		local v44 = build_slot(p_u_42, v43, first_empty_slot)
 	end
 end
+
+local function dump(tbl, indent)
+	indent = indent or ""
+	if type(tbl) ~= "table" then
+		print(indent .. tostring(tbl))
+		return
+	end
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			print(indent .. tostring(k) .. " = {")
+			dump(v, indent .. "  ")
+			print(indent .. "}")
+		else
+			print(indent .. tostring(k) .. " = " .. tostring(v))
+		end
+	end
+end
+
 function build_slot(p_u_66, Index, first_empty_slot)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
 	if Index == first_empty_slot and not pet_in_slot then
+		
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
 		v68.Name = "AddItem"
@@ -639,9 +638,16 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
 			if PetData.unique == pet_in_slot.unique then
 				pe = PetData
-				print(dump(pe))
+				dump(pe)
 			end
 		end
+		
+		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
+		local Cloned = TagDisplayTemplate:Clone()
+		Cloned.Parent = v69
+		Cloned.flyable.Visible = pe.flyable
+		Cloned.mega_neon.Visible = pe.mega_neon
+		Cloned.neon.Visible = pe.neon
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
