@@ -564,63 +564,48 @@ local Offer = {
 local function build_slots(SlotsFrame)
 	local addItemCreated = false
 	local lastIndexWithData = nil
-
+	local addItemSlot = nil
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		local v68
-
-		-- Если слот заполнен уникальным элементом
-		if Data["states"] == "pet" then
-			v68 = SlotsFrame.SlotTemplate:Clone()
-			v68.Visible = true
-			v68.Name = "PetSlot" .. Index
-			v68.LayoutOrder = Index
-			v68.Parent = SlotsFrame
-			v68.AddItem:Destroy()  -- Удаляем AddItem, так как слот уже занят уникальным элементом
-			-- Обновляем слот с уникальным элементом
-			print("Created PetSlot " .. Index)
-
-			-- Если слот пустой, создаем AddItem только один раз
-		elseif Data["states"] == "add_item" and not addItemCreated then
-			v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
-			v68.Visible = true
-			v68.Name = "AddItem"
-			v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
-			v68.Parent = SlotsFrame
-			addItemCreated = true
-			print("Created AddItem at position " .. (lastIndexWithData == nil and 1 or lastIndexWithData + 1))
-
-			-- Если слот пустой и не первый, создаем обычный SlotTemplate
-		elseif Data["states"] == "" then
+		if Data.unique ~= "" then  
 			v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
 			v68.Name = "Slot" .. Index
-			v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
+			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
-			v68.AddItem:Destroy()  -- Удаляем AddItem, так как это обычный слот
-			print("Created SlotTemplate at position " .. (lastIndexWithData == nil and 1 or lastIndexWithData + 1))
-		end
-
-		-- Логика для клика по слоту
-		Wrap(v68, "DepthButton"):start({
-			["mouse_button1_click"] = function()
-				local v4 = load("UIManager").apps.BackpackApp:pick_item({
-					["allow_callback"] = function(_)
-						return true
+			v68.AddItem:Destroy()
+			lastIndexWithData = Index
+		else
+			if not addItemCreated then
+				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
+				v68.Visible = true
+				v68.Name = "AddItem"
+				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
+				v68.Parent = SlotsFrame
+				Wrap(v68, "DepthButton"):start({
+					["mouse_button1_click"] = function()
+						local v4 = load("UIManager").apps.BackpackApp:pick_item({
+							["allow_callback"] = function(_)
+								return true
+							end,
+						})
+						if v4.unique then
+							Offer.Offers.My.Offer[v4.unique] = slotNumber
+						end
 					end,
 				})
-				if v4.unique then
-					-- Обновляем состояние и уникальность в соответствующем слоте
-					Offer.Offers.My.Offer[slotNumber]["states"] = "pet"  -- Обновляем состояние на "pet"
-					Offer.Offers.My.Offer[slotNumber]["unique"] = v4.unique
-					print("Updated Slot " .. slotNumber .. " with unique: " .. v4.unique)
-					-- Теперь слот будет отображаться как "pet" с уникальным элементом
-				end
-			end,
-		})
-
-		-- Обновляем индекс последнего заполненного слота
-		lastIndexWithData = slotNumber
+				addItemCreated = true
+				addItemSlot = v68
+			else
+				v68 = SlotsFrame.SlotTemplate:Clone()
+				v68.Visible = true
+				v68.Name = "Slot" .. Index
+				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
+				v68.Parent = SlotsFrame
+				v68.AddItem:Destroy()
+			end
+		end
 	end
 end
 
