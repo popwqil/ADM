@@ -626,7 +626,7 @@ local function StartTrade()
 	NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
 
 
-	load("UIManager").wrap(NegotiationFrame.Body.MyOffer.Slots, "OfferPane"):start({
+	load("UIManager").wrap(NegotiationFrame.Body.MyOffer, "OfferPane"):start({
 		["num_condensed_slots"] = 4,
 		["num_slots"] = 18,
 		["should_tween_mobile_layout"] = true,
