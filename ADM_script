@@ -599,7 +599,7 @@ end
 function build_slot(p_u_66, Index, first_empty_slot)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
 	if Index == first_empty_slot and not pet_in_slot then
-		
+
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
 		v68.Name = "AddItem"
@@ -641,7 +641,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			end
 		end
 
-		
+
 		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
 		local Cloned = TagDisplayTemplate:Clone()
 		Cloned.Parent = v69
@@ -650,18 +650,24 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				v.Visible = false
 			end
 		end
+		Cloned.left_aligned:Destroy()
 		Cloned.flyable.Visible = PD.properties.flyable
 		Cloned.rideable.Visible = PD.properties.rideable
 		Cloned.mega_neon.Visible = PD.properties.mega_neon
 		Cloned.neon.Visible = PD.properties.neon
 		
+		Cloned.neon.Size = UDim2.new(0.1, 0, 0.1, 0)
+		Cloned.mega_neon.Size = UDim2.new(0.1, 0, 0.1, 0)
+		Cloned.rideable.Size = UDim2.new(0.1, 0, 0.1, 0)
+		Cloned.flyable.Size = UDim2.new(0.1, 0, 0.1, 0)
+
 		local ImagePetDataBase
 		for i,v in pairs(petDatabase) do
 			if i == PD.kind then
 				ImagePetDataBase = v.image
 			end
 		end
-		
+
 		local ItemImageTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.ItemImageTemplate
 		local Cloned2 = ItemImageTemplate:Clone()
 		Cloned2.Parent = v69
