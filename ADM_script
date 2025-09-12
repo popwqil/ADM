@@ -531,15 +531,15 @@ local Offer = {
 			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {
-				[1] = nil,
-				[2] = nil,
-				[3] = nil,
-				[4] = nil,
-				[5] = nil,
-				[6] = nil,
-				[7] = nil,
-				[8] = nil,
-				[9] = nil
+				[1] = false,
+				[2] = false,
+				[3] = false,
+				[4] = false,
+				[5] = false,
+				[6] = false,
+				[7] = false,
+				[8] = false,
+				[9] = false
 			}
 		},
 		Partner = {
@@ -547,15 +547,15 @@ local Offer = {
 			accepted_confirmation = false,
 			shown_pets = {},
 			Offer = {
-				[1] = nil,
-				[2] = nil,
-				[3] = nil,
-				[4] = nil,
-				[5] = nil,
-				[6] = nil,
-				[7] = nil,
-				[8] = nil,
-				[9] = nil
+				[1] = false,
+				[2] = false,
+				[3] = false,
+				[4] = false,
+				[5] = false,
+				[6] = false,
+				[7] = false,
+				[8] = false,
+				[9] = false
 			}
 		},
 	},
@@ -566,7 +566,7 @@ local function build_slots(SlotsFrame)
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		print("Index: " .. Index)  -- Логируем индекс для отладки
-		if Data ~= nil then
+		if Data ~= false then  -- Проверка, что данные не равны false
 			local v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
 			v68.Name = "Slot" .. Index
@@ -613,6 +613,7 @@ local function build_slots(SlotsFrame)
 		end
 	end
 end
+
 
 
 local function OpenProfile(Id)
