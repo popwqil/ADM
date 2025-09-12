@@ -562,7 +562,13 @@ function build_slot(p_u_66, Index)
 	v68.Parent = p_u_66.instance.Slots
 	local add_item = load("UIManager").wrap(v68, "DepthButton"):start({
 		["mouse_button1_click"] = function()
-
+			local v161 = load("UIManager").apps.BackpackApp:pick_item({
+				["keep_cached_scroll_positions_on_open"] = true,
+				["allow_callback"] = function(_)
+					return true;
+				end
+			})
+			Offer.Offers.My.shown_pets[Index] = v161
 		end,
 		["shine"] = true
 	})
@@ -574,16 +580,15 @@ function build_slot(p_u_66, Index)
 	v69.AddItem:Destroy()
 	v69.Parent = p_u_66.instance.Slots
 
-	-- Проверяем, существует ли элемент в shown_items
 	local v70 = Offer.shown_items and Offer.shown_items[Index]
 
 	if v70 then
 		v69.ImageTransparency = 0
-		local v_u_71 = v70.item
-
-		v69.Activated:Connect(function()
-			-- действие при активации
-		end)
+		--[[local v_u_71 = v70.item
+		p_u_66:_init_slot_item_image(v69, v_u_71)
+		if not p_u_66.props.do_not_display_tags then
+			p_u_66:_init_slot_tag_display(v69, v_u_71)
+		end]]
 	else
 		v69.ImageTransparency = 0.5
 	end
