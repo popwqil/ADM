@@ -562,14 +562,24 @@ local Offer = {
 }
 
 local function build_slots(SlotsFrame)
+	-- Очищаем все слоты перед новым построением
+	for _, slot in ipairs(SlotsFrame:GetChildren()) do
+		if slot:IsA("ImageButton") then
+			slot:Destroy()
+		end
+	end
+
 	local addItemCreated = false
 	local lastIndexWithData = nil
 	local addItemSlot = nil
 	local nextSlot = nil  -- Следующий слот для AddItem
 
+	-- Перебираем все слоты
 	for Index, Data in pairs(Offer.Offers.My.Offer) do
 		local slotNumber = Index
 		local v68
+
+		-- Если слот заполнен (есть уникальные данные)
 		if Data.unique ~= "" then  
 			v68 = SlotsFrame.SlotTemplate:Clone()
 			v68.Visible = true
@@ -577,15 +587,26 @@ local function build_slots(SlotsFrame)
 			v68.LayoutOrder = Index
 			v68.Parent = SlotsFrame
 			v68.AddItem:Destroy()
-			v68.ImageTransparency = 0
+			v68.ImageTransparency = 0  -- Сделать слот видимым
+
+			-- Инициализируем содержимое слота (например, добавить изображение, если нужно)
+			-- Пример:
+			-- local itemImage = Instance.new("ImageLabel")
+			-- itemImage.Size = UDim2.new(1, 0, 1, 0)
+			-- itemImage.Image = "rbxassetid://" .. Data.unique  -- Поставить изображение
+			-- itemImage.Parent = v68
+
 			lastIndexWithData = Index
 		else
+			-- Если слот пустой и еще не создан AddItem
 			if not addItemCreated then
 				v68 = SlotsFrame.SlotTemplate.AddItem:Clone()
 				v68.Visible = true
 				v68.Name = "AddItem"
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
+
+				-- Привязка кнопки для добавления элемента
 				Wrap(v68, "DepthButton"):start({
 					["mouse_button1_click"] = function()
 						local v4 = load("UIManager").apps.BackpackApp:pick_item({
@@ -594,26 +615,45 @@ local function build_slots(SlotsFrame)
 							end,
 						})
 						if v4.unique then
+							-- Когда уникальный элемент выбран, записываем его в слот
 							Offer.Offers.My.Offer[slotNumber].unique = v4.unique
+
+							-- Перерисовываем все слоты
 							build_slots(SlotsFrame)
 						end
 					end,
 				})
+
 				addItemCreated = true
 				addItemSlot = v68
-				nextSlot = v68
+				nextSlot = v68  -- Сохраняем слот для AddItem
 			else
+				-- Если AddItem уже был создан, создаем новый пустой слот
 				v68 = SlotsFrame.SlotTemplate:Clone()
 				v68.Visible = true
 				v68.Name = "Slot" .. Index
 				v68.LayoutOrder = lastIndexWithData == nil and 1 or lastIndexWithData + 1
 				v68.Parent = SlotsFrame
 				v68.AddItem:Destroy()
-				v68.ImageTransparency = 0.5
+				v68.ImageTransparency = 0.5  -- Сделать слот полупрозрачным
+			end
+		end
+	end
+
+	-- Обновляем прозрачность всех слотов, чтобы отобразить правильное состояние
+	for _, Data in pairs(Offer.Offers.My.Offer) do
+		local slot = SlotsFrame:FindFirstChild("Slot" .. _)
+		if slot then
+			if Data.unique ~= "" then
+				slot.ImageTransparency = 0  -- Если уникальный элемент, слот видимый
+			else
+				slot.ImageTransparency = 0.5  -- Если пустой, слот полупрозрачный
 			end
 		end
 	end
 end
+
+
 
 
 
