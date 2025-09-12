@@ -634,23 +634,20 @@ function build_slot(p_u_66, Index, first_empty_slot)
 	if pet_in_slot then
 		v69.ImageTransparency = 0
 
-		local pe
+		local PD
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
-			print(PetUnique)
-			dump(PetUnique)
-			dump(PetData)
 			if PetData.unique == pet_in_slot.unique then
-				pe = PetData
-				dump(pe)
+				PD = PetData
 			end
 		end
 		
 		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
 		local Cloned = TagDisplayTemplate:Clone()
 		Cloned.Parent = v69
-		Cloned.flyable.Visible = pe.flyable
-		Cloned.mega_neon.Visible = pe.mega_neon
-		Cloned.neon.Visible = pe.neon
+		for i,v in pairs(Cloned:GetChildren()) do
+			v.Visible = false
+			v.Visible = PD.properties[v.Name]
+		end
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
