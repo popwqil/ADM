@@ -651,12 +651,13 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			end
 		end
 		Cloned.left_aligned:Destroy()
+		Cloned.bonus:Destroy()
 		Cloned.flyable.Visible = PD.properties.flyable
 		Cloned.rideable.Visible = PD.properties.rideable
 		Cloned.mega_neon.Visible = PD.properties.mega_neon
 		Cloned.neon.Visible = PD.properties.neon
 
-		Cloned.Size = UDim2.new(1, -6, 0, 15)
+		Cloned.Size = UDim2.new(1, -6, 0, 10)
 
 		local ImagePetDataBase
 		for i,v in pairs(petDatabase) do
