@@ -574,8 +574,6 @@ local function reset_offer(SlotsFrame)
 			end
 		end
 	end
-
-	build_slots(SlotsFrame)
 end
 
 function build_slots(SlotsFrame)
