@@ -938,6 +938,7 @@ local function StartTrade()
 					My = {
 						shown_pets = {},
 						num_slots = 9,
+						unpressable_add_item = false,
 						accepted_negotiation = false,
 						accepted_confirmation = false,
 					},
@@ -970,8 +971,7 @@ local function StartTrade()
 		end
 	})
 	
-	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
-	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
+	Wrap(ConfirmationFrame.Decline, "DepthButton"):start({
 		["mouse_button1_click"] = function()
 			FakeTradeApp:Destroy()
 			Offer = {
@@ -981,6 +981,7 @@ local function StartTrade()
 					My = {
 						shown_pets = {},
 						num_slots = 9,
+						unpressable_add_item = false,
 						accepted_negotiation = false,
 						accepted_confirmation = false,
 					},
