@@ -848,6 +848,25 @@ local function StartTrade()
 				NegotiationFrame.Body.PartnerOffer.Accepted.Visible = false
 				NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
 			end
+			
+			if Offer.Offers.My.accepted_negotiation and Offer.Offers.Partner.accepted_negotiation  then
+				
+				wait(0.1)
+				NegotiationFrame.Visible = false
+				ConfirmationFrame.Visible = true
+				
+				
+				load("UIManager").apps.DialogApp:dialog({
+					["text"] = "This trade seems unbalanced. Be careful - you could be getting scammed.",
+					["button"] = "Next",
+					["yields"] = false
+				})
+				load("UIManager").apps.DialogApp:dialog({
+					["text"] = "Any items lost to scams WILL NOT be returned. Be sure before you accept!",
+					["button"] = "I understand",
+					["yields"] = false
+				})
+			end
 
 		end
 	end
