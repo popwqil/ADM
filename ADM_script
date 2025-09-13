@@ -525,14 +525,14 @@ UpdateTradePlayers()
 
 TradeTab:Separator({Text = "Fake Trade"})
 
-
+local AcceptWrapButton
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
 	Offers = {
 		My = {
 			shown_pets = {},
-			num_slots = 9, -- Начинаем с 9 слотов
+			num_slots = 9,
 			accepted_negotiation = false,
 			accepted_confirmation = false,
 		},
@@ -542,8 +542,6 @@ local Offer = {
 		},
 	},
 }
-
--- Функция для подсчета заполненных слотов
 function count_filled_slots()
 	local count = 0
 	for i = 1, Offer.Offers.My.num_slots do
@@ -553,20 +551,14 @@ function count_filled_slots()
 	end
 	return count
 end
--- Функция для динамического изменения количества слотов
 function update_slots_count()
 	local filled_slots = count_filled_slots()
 	local current_slots = Offer.Offers.My.num_slots
-
-	-- Увеличиваем слоты если все заполнены (но не больше 18)
 	if filled_slots >= current_slots and current_slots < 18 then
 		Offer.Offers.My.num_slots = math.min(current_slots + 3, 18)
-		return true -- Указывает что количество слотов изменилось
+		return true
 	end
-
-	-- Уменьшаем слоты если много пустых (но не меньше 9)
 	if filled_slots <= current_slots - 6 and current_slots > 9 then
-		-- Проверяем что мы не потеряем заполненные слоты
 		local new_slots = math.max(current_slots - 3, 9)
 		if filled_slots <= new_slots then
 			Offer.Offers.My.num_slots = new_slots
@@ -574,9 +566,8 @@ function update_slots_count()
 		end
 	end
 
-	return false -- Количество слотов не изменилось
+	return false
 end
-
 function clear_slots(p81)
 	if p81 and p81.instance and p81.instance.Slots then
 		for _, child in pairs(p81.instance.Slots:GetChildren()) do
@@ -586,34 +577,25 @@ function clear_slots(p81)
 		end
 	end
 end
-
 function compact_pets()
 	local compacted = {}
-	-- Собираем все заполненные слоты по порядку
 	for i = 1, Offer.Offers.My.num_slots do
 		if Offer.Offers.My.shown_pets[i] then
 			table.insert(compacted, Offer.Offers.My.shown_pets[i])
 		end
 	end
-
-	-- Очищаем и заново расставляем
 	Offer.Offers.My.shown_pets = {}
 	for i, pet_unique in ipairs(compacted) do
 		Offer.Offers.My.shown_pets[i] = pet_unique
 	end
-
-	-- После уплотнения проверяем нужно ли изменить количество слотов
 	update_slots_count()
 end
--- Добавьте эту функцию после существующих функций
 function refresh_grid_container(p_u_42)
-	local v48 = p_u_42.instance.Slots  -- Slots контейнер
-	local v49 = v48.Parent             -- Родительский контейнер
-	local v50 = v48:FindFirstChildWhichIsA("UIGridLayout")  -- Grid Layout
-	local v51 = v48:FindFirstChildWhichIsA("UIPadding")     -- Padding
-	if not v50 then return end  -- Если нет GridLayout, выходим
-
-	-- Сохраняем оригинальные размеры если еще не сохранены
+	local v48 = p_u_42.instance.Slots
+	local v49 = v48.Parent
+	local v50 = v48:FindFirstChildWhichIsA("UIGridLayout")
+	local v51 = v48:FindFirstChildWhichIsA("UIPadding")
+	if not v50 then return end
 	if not v50:GetAttribute("OriginalCellSize") then
 		v50:SetAttribute("OriginalCellSize", v50.CellSize)
 	end
@@ -624,11 +606,7 @@ function refresh_grid_container(p_u_42)
 	if not v48:GetAttribute("OriginalSize") then
 		v48:SetAttribute("OriginalSize", v48.Size)
 	end
-
-	-- Подсчитываем количество видимых предметов
 	local v59 = count_filled_slots()
-
-	-- Добавляем 1 для кнопки "добавить предмет" если есть пустой слот
 	local has_add_button = false
 	for i = 1, Offer.Offers.My.num_slots do
 		if not Offer.Offers.My.shown_pets[i] then
@@ -639,55 +617,31 @@ function refresh_grid_container(p_u_42)
 	if has_add_button then
 		v59 = v59 + 1
 	end
-
-	-- Настройки для мобильных устройств
-	local platform = get_platform()
-	if platform == "mobile" then
-		-- Можно добавить специальные настройки для мобильных
-		local layout_type = v59 <= 8 and "loose" or "compact"
-		-- Здесь можно добавить мобильные настройки если нужно
-	end
-
-	-- Изменяем размеры если предметов больше 9
 	if v59 > 9 then
-		-- Уменьшаем размер ячеек
 		local original_cell_size = v50:GetAttribute("OriginalCellSize")
 		v50.CellSize = original_cell_size - UDim2.fromOffset(4, 4)
-
-		-- Увеличиваем размер родительского контейнера
 		local original_parent_size = v49:GetAttribute("OriginalSize")
 		local original_parent_position = v49:GetAttribute("OriginalPosition")
 		v49.Size = original_parent_size + UDim2.fromOffset(4, 0)
 		v49.Position = original_parent_position - UDim2.fromOffset(2, 0)
-
-		-- Уменьшаем размер контейнера слотов
 		local original_slots_size = v48:GetAttribute("OriginalSize")
 		v48.Size = original_slots_size - UDim2.fromOffset(4, 0)
 	else
-		-- Возвращаем оригинальные размеры
 		v50.CellSize = v50:GetAttribute("OriginalCellSize")
 		v49.Size = v49:GetAttribute("OriginalSize")
 		v49.Position = v49:GetAttribute("OriginalPosition")
 		v48.Size = v48:GetAttribute("OriginalSize")
 	end
-
-	-- Обновляем CanvasSize для ScrollingFrame
 	if v51 then
-		-- Ждем один кадр чтобы AbsoluteContentSize обновился
 		game:GetService("RunService").Heartbeat:Wait()
-
 		local v60 = UDim2.fromOffset(0, v51.PaddingTop.Offset + v51.PaddingBottom.Offset)
 		local v61 = v50.AbsoluteContentSize
-
-		-- Устанавливаем CanvasSize
 		if v48.ClassName == "ScrollingFrame" then
 			v48.CanvasSize = UDim2.fromOffset(v61.X, v61.Y) + v60
 		end
 	else
-		-- Если нет padding, просто используем AbsoluteContentSize
 		game:GetService("RunService").Heartbeat:Wait()
 		local v61 = v50.AbsoluteContentSize
-
 		if v48.ClassName == "ScrollingFrame" then
 			v48.CanvasSize = UDim2.fromOffset(v61.X, v61.Y)
 		end
@@ -699,17 +653,27 @@ function build_all_slots(p_u_42)
 
 	compact_pets()
 	clear_slots(p_u_42)
+
 	local first_empty_slot = nil
-	for i = 1, Offer.Offers.My.num_slots do
-		if not Offer.Offers.My.shown_pets[i] then
-			first_empty_slot = i
-			break
+	if not Offer.Offers.My.accepted_negotiation then
+		for i = 1, Offer.Offers.My.num_slots do
+			if not Offer.Offers.My.shown_pets[i] then
+				first_empty_slot = i
+				break
+			end
 		end
 	end
+
 	for v43 = 1, Offer.Offers.My.num_slots do
 		local v44 = build_slot(p_u_42, v43, first_empty_slot)
 	end
+
 	refresh_grid_container(p_u_42)
+
+	if Offer.trade_make then
+		refresh_all()
+	end
+
 	if slots_changed then
 		print("Slots updated: " .. Offer.Offers.My.num_slots .. " slots available")
 	end
@@ -718,8 +682,7 @@ end
 function build_slot(p_u_66, Index, first_empty_slot)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
 
-	-- Создание кнопки "Добавить предмет" только для первого пустого слота
-	if Index == first_empty_slot and not pet_in_slot then
+	if Index == first_empty_slot and not pet_in_slot and not Offer.Offers.My.accepted_negotiation then
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
 		v68.Name = "AddItem"
@@ -736,7 +699,6 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				})
 				if v161 then
 					Offer.Offers.My.shown_pets[Index] = v161.unique
-					-- При добавлении предмета пересоздаем все слоты
 					build_all_slots(p_u_66)
 				end
 			end,
@@ -745,7 +707,6 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		return v68
 	end
 
-	-- Создание обычного слота
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
@@ -796,10 +757,13 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			Cloned2.Parent = v69
 			Cloned2.Image = ImagePetDataBase
 		end
-
 		v69.Activated:Connect(function()
-			Offer.Offers.My.shown_pets[Index] = nil
-			build_all_slots(p_u_66)
+			if Offer.Offers.My.accepted_negotiation then
+				return
+			else
+				Offer.Offers.My.shown_pets[Index] = nil
+				build_all_slots(p_u_66)
+			end
 		end)
 	else
 		v69.ImageTransparency = 0.5
@@ -819,6 +783,12 @@ function get_slots_info()
 	}
 end
 
+
+
+
+
+
+
 local function OpenProfile(Id)
 	load("UIManager").apps.PlayerProfileApp:open_player_profile_for_user_id(Id)
 end
@@ -836,8 +806,6 @@ local function StartTrade()
 	local Negotiation_my_name_label = FakeTradeApp.Frame.NegotiationFrame.Header.YouFrame.NameLabel
 	local Confirmation_partner_name_label = FakeTradeApp.Frame.ConfirmationFrame.PartnerLabel
 	local Confirmation_my_name_label = FakeTradeApp.Frame.ConfirmationFrame.YouLabel
-
-	local AcceptWrapButton
 
 	function refresh_all()
 		if Offer.trade_state == "negotiation" then
