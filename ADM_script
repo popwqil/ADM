@@ -667,7 +667,7 @@ function refresh_grid_container(p_u_42)
 end
 
 
-function build_all_slots(p_u_42)
+function build_all_slots(p_u_42, add_item_not)
 	local slots_changed = update_slots_count()
 
 	compact_pets()
@@ -684,7 +684,7 @@ function build_all_slots(p_u_42)
 	end
 
 	for v43 = 1, Offer.Offers.My.num_slots do
-		local v44 = build_slot(p_u_42, v43, first_empty_slot)
+		local v44 = build_slot(p_u_42, v43, first_empty_slot, add_item_not)
 	end
 
 	refresh_grid_container(p_u_42)
@@ -698,10 +698,11 @@ function build_all_slots(p_u_42)
 	end
 end
 
-function build_slot(p_u_66, Index, first_empty_slot)
+function build_slot(p_u_66, Index, first_empty_slot, add_item_not)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
 
-	if Index == first_empty_slot and not pet_in_slot and not Offer.Offers.My.accepted_negotiation then
+	if Index == first_empty_slot and not pet_in_slot and not Offer.Offers.My.accepted_negotiation and add_item_not then
+		
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
 		v68.Name = "AddItem"
@@ -718,7 +719,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				})
 				if v161 then
 					Offer.Offers.My.shown_pets[Index] = v161.unique
-					build_all_slots(p_u_66)
+					build_all_slots(p_u_66, add_item_not)
 					spawn(function()
 						AcceptWrapButton:set_state("unpressable")
 						Offer.Offers.My.unpressable_add_item = true
@@ -731,6 +732,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 			["shine"] = true
 		})
 		return v68
+		
 	end
 
 	local v69 = p_u_66.slot_template:Clone()
@@ -788,7 +790,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				return
 			else
 				Offer.Offers.My.shown_pets[Index] = nil
-				build_all_slots(p_u_66)
+				build_all_slots(p_u_66, add_item_not)
 			end
 		end)
 	else
@@ -859,6 +861,14 @@ local function StartTrade()
 				NegotiationFrame.Body.PartnerOffer.Accepted.ImageTransparency = 0
 			end
 			
+			if Offer.Offers.My.accepted_negotiation then
+				NegotiationFrame.Body.MyOffer.Accepted.Visible = true
+				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0.3
+			else
+				NegotiationFrame.Body.MyOffer.Accepted.Visible = false
+				NegotiationFrame.Body.MyOffer.Accepted.ImageTransparency = 0
+			end
+			
 			if Offer.Offers.My.accepted_negotiation and Offer.Offers.Partner.accepted_negotiation  then
 				
 				wait(0.1)
@@ -925,7 +935,14 @@ local function StartTrade()
 			["Slots"] = NegotiationFrame.Body.MyOffer.Slots
 		},
 		["slot_template"] = NegotiationFrame.Body.MyOffer.Slots.SlotTemplate
-	})
+	}, true)
+	
+	build_all_slots({
+		["instance"] = {
+			["Slots"] = NegotiationFrame.Body.PartnerOffer.Slots
+		},
+		["slot_template"] = NegotiationFrame.Body.PartnerOffer.Slots.SlotTemplate
+	}, false)
 
 	local DeclineButtonNegotiationFrame = NegotiationFrame.Body.Decline
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
