@@ -392,6 +392,7 @@ TradeTab:InputText({
 		PlayerCombo.Items = filtered
 	end,
 })
+
 TradeTab:Button({
 	Text = "Make Name",
 	Callback = function(self)
@@ -524,18 +525,14 @@ UpdateTradePlayers()
 
 TradeTab:Separator({Text = "Fake Trade"})
 
-local v_u_12 = {
-	["Normal"] = 1,
-	["Removed"] = 2,
-	["Changed"] = 3
-}
+
 local Offer = {
 	trade_state = "negotiation",
 	trade_make = false,
 	Offers = {
 		My = {
 			shown_pets = {},
-			num_slots = 9,
+			num_slots = 9, -- Начинаем с 9 слотов
 			accepted_negotiation = false,
 			accepted_confirmation = false,
 		},
@@ -545,6 +542,36 @@ local Offer = {
 		},
 	},
 }
+
+-- Функция для обновления количества слотов
+function update_slots_count()
+	local filled_slots = 0
+
+	-- Подсчитываем заполненные слоты
+	for i = 1, 18 do -- Проверяем до максимума
+		if Offer.Offers.My.shown_pets[i] then
+			filled_slots = filled_slots + 1
+		end
+	end
+
+	-- Логика увеличения слотов
+	if filled_slots >= Offer.Offers.My.num_slots and Offer.Offers.My.num_slots < 18 then
+		-- Если все слоты заполнены и можем увеличить
+		Offer.Offers.My.num_slots = math.min(Offer.Offers.My.num_slots + 3, 18)
+	else
+		-- Логика уменьшения слотов
+		if filled_slots <= Offer.Offers.My.num_slots - 6 and Offer.Offers.My.num_slots > 9 then
+			-- Если заполнено меньше чем (текущие слоты - 6), уменьшаем
+			Offer.Offers.My.num_slots = math.max(Offer.Offers.My.num_slots - 3, 9)
+		elseif filled_slots <= Offer.Offers.My.num_slots - 3 and Offer.Offers.My.num_slots > 9 then
+			-- Более мягкое уменьшение: если заполнено меньше чем (текущие слоты - 3)
+			local new_slot_count = math.max(filled_slots + 3, 9)
+			new_slot_count = math.ceil(new_slot_count / 3) * 3 -- Округляем до кратного 3
+			Offer.Offers.My.num_slots = new_slot_count
+		end
+	end
+end
+
 function clear_slots(p81)
 	if p81 and p81.instance and p81.instance.Slots then
 		for _, child in pairs(p81.instance.Slots:GetChildren()) do
@@ -554,21 +581,34 @@ function clear_slots(p81)
 		end
 	end
 end
+
 function compact_pets()
 	local compacted = {}
-	for i = 1, Offer.Offers.My.num_slots do
+	-- Собираем все заполненные слоты
+	for i = 1, 18 do -- Проверяем до максимума
 		if Offer.Offers.My.shown_pets[i] then
 			table.insert(compacted, Offer.Offers.My.shown_pets[i])
 		end
 	end
+
+	-- Очищаем массив и заново заполняем без пропусков
 	Offer.Offers.My.shown_pets = {}
 	for i, pet_unique in ipairs(compacted) do
 		Offer.Offers.My.shown_pets[i] = pet_unique
 	end
 end
+
 function build_all_slots(p_u_42)
+	-- Сначала компактируем питомцев
 	compact_pets()
+
+	-- Обновляем количество слотов
+	update_slots_count()
+
+	-- Очищаем существующие слоты
 	clear_slots(p_u_42)
+
+	-- Находим первый пустой слот
 	local first_empty_slot = nil
 	for i = 1, Offer.Offers.My.num_slots do
 		if not Offer.Offers.My.shown_pets[i] then
@@ -576,15 +616,21 @@ function build_all_slots(p_u_42)
 			break
 		end
 	end
+
+	-- Создаем слоты только для текущего количества
 	for v43 = 1, Offer.Offers.My.num_slots do
 		local v44 = build_slot(p_u_42, v43, first_empty_slot)
 	end
+
+	-- Выводим информацию для отладки
+	print("Slots info: filled=" .. (#Offer.Offers.My.shown_pets or 0) .. ", total_slots=" .. Offer.Offers.My.num_slots)
 end
 
 function build_slot(p_u_66, Index, first_empty_slot)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
-	if Index == first_empty_slot and not pet_in_slot then
 
+	-- Если это первый пустой слот - создаем кнопку добавления
+	if Index == first_empty_slot and not pet_in_slot then
 		local v68 = p_u_66.slot_template.AddItem:Clone()
 		v68.Visible = true
 		v68.Name = "AddItem"
@@ -601,6 +647,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				})
 				if v161 then
 					Offer.Offers.My.shown_pets[Index] = v161.unique
+					-- После добавления питомца пересоздаем все слоты
 					build_all_slots(p_u_66)
 				end
 			end,
@@ -609,6 +656,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		return v68
 	end
 
+	-- Создаем обычный слот
 	local v69 = p_u_66.slot_template:Clone()
 	v69.Visible = true
 	v69.Name = "Slot" .. Index
@@ -623,37 +671,41 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
 			if PetData.unique == pet_in_slot then
 				PD = PetData
+				break
 			end
 		end
 
-		local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
-		local Cloned = TagDisplayTemplate:Clone()
-		Cloned.Parent = v69
-		for i,v in pairs(Cloned:GetChildren()) do
-			if v:IsA("ImageLabel") then
-				v.Visible = false
+		if PD then
+			local TagDisplayTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.TagDisplayTemplate
+			local Cloned = TagDisplayTemplate:Clone()
+			Cloned.Parent = v69
+			for i,v in pairs(Cloned:GetChildren()) do
+				if v:IsA("ImageLabel") then
+					v.Visible = false
+				end
 			end
-		end
-		Cloned.left_aligned:Destroy()
-		Cloned.bonus:Destroy()
-		Cloned.flyable.Visible = PD.properties.flyable
-		Cloned.rideable.Visible = PD.properties.rideable
-		Cloned.mega_neon.Visible = PD.properties.mega_neon
-		Cloned.neon.Visible = PD.properties.neon
+			Cloned.left_aligned:Destroy()
+			Cloned.bonus:Destroy()
+			Cloned.flyable.Visible = PD.properties.flyable
+			Cloned.rideable.Visible = PD.properties.rideable
+			Cloned.mega_neon.Visible = PD.properties.mega_neon
+			Cloned.neon.Visible = PD.properties.neon
+			Cloned.Size = UDim2.new(1, -6, 0, 10)
 
-		Cloned.Size = UDim2.new(1, -6, 0, 10)
-
-		local ImagePetDataBase
-		for i,v in pairs(petDatabase) do
-			if i == PD.kind then
-				ImagePetDataBase = v.image
+			local ImagePetDataBase
+			for i,v in pairs(petDatabase) do
+				if i == PD.kind then
+					ImagePetDataBase = v.image
+					break
+				end
 			end
-		end
 
-		local ItemImageTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.ItemImageTemplate
-		local Cloned2 = ItemImageTemplate:Clone()
-		Cloned2.Parent = v69
-		Cloned2.Image = ImagePetDataBase
+			local ItemImageTemplate = game.ReplicatedStorage.Resources.UI_Resources.Templates.ItemImageTemplate
+			local Cloned2 = ItemImageTemplate:Clone()
+			Cloned2.Parent = v69
+			Cloned2.Image = ImagePetDataBase
+
+		end
 
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
