@@ -554,10 +554,14 @@ end
 function update_slots_count()
 	local filled_slots = count_filled_slots()
 	local current_slots = Offer.Offers.My.num_slots
+
+	-- Если все слоты заполнены и их количество меньше 18, добавляем 3 слота
 	if filled_slots >= current_slots and current_slots < 18 then
 		Offer.Offers.My.num_slots = math.min(current_slots + 3, 18)
 		return true
 	end
+
+	-- Если меньше 6 слотов пустых, уменьшаем количество слотов, но не меньше 9
 	if filled_slots <= current_slots - 6 and current_slots > 9 then
 		local new_slots = math.max(current_slots - 3, 9)
 		if filled_slots <= new_slots then
@@ -598,6 +602,7 @@ function refresh_grid_container(p_u_42)
 
 	if not v50 then return end
 
+	-- Сохраняем оригинальные размеры и позиции
 	if not v50:GetAttribute("OriginalCellSize") then
 		v50:SetAttribute("OriginalCellSize", v50.CellSize)
 	end
@@ -608,9 +613,10 @@ function refresh_grid_container(p_u_42)
 	if not v48:GetAttribute("OriginalSize") then
 		v48:SetAttribute("OriginalSize", v48.Size)
 	end
-	
+
 	local v59 = count_filled_slots()
 
+	-- Определяем, можно ли добавить предметы
 	local can_add_items = not Offer.Offers.My.accepted_negotiation
 	if can_add_items then
 		local has_empty_slot = false
@@ -624,6 +630,8 @@ function refresh_grid_container(p_u_42)
 			v59 = v59 + 1
 		end
 	end
+
+	-- Если слотов больше 9, изменяем размер сетки
 	if v59 > 9 then
 		local original_cell_size = v50:GetAttribute("OriginalCellSize")
 		v50.CellSize = original_cell_size - UDim2.fromOffset(4, 4)
@@ -641,6 +649,8 @@ function refresh_grid_container(p_u_42)
 		v49.Position = v49:GetAttribute("OriginalPosition")
 		v48.Size = v48:GetAttribute("OriginalSize")
 	end
+
+	-- Обновляем CanvasSize
 	if v51 then
 		local v60 = UDim2.fromOffset(0, v51.PaddingTop.Offset + v51.PaddingBottom.Offset)
 		local v61 = v50.AbsoluteContentSize
@@ -654,6 +664,7 @@ function refresh_grid_container(p_u_42)
 		end
 	end
 end
+
 
 function build_all_slots(p_u_42)
 	local slots_changed = update_slots_count()
