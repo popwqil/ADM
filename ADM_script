@@ -581,23 +581,6 @@ function build_all_slots(p_u_42)
 	end
 end
 
-local function dump(tbl, indent)
-	indent = indent or ""
-	if type(tbl) ~= "table" then
-		print(indent .. tostring(tbl))
-		return
-	end
-	for k, v in pairs(tbl) do
-		if type(v) == "table" then
-			print(indent .. tostring(k) .. " = {")
-			dump(v, indent .. "  ")
-			print(indent .. "}")
-		else
-			print(indent .. tostring(k) .. " = " .. tostring(v))
-		end
-	end
-end
-
 function build_slot(p_u_66, Index, first_empty_slot)
 	local pet_in_slot = Offer.Offers.My.shown_pets[Index]
 	if Index == first_empty_slot and not pet_in_slot then
@@ -635,8 +618,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 
 	if pet_in_slot then
 		v69.ImageTransparency = 0
-		
-		--[[
+
 		local PD
 		for PetUnique, PetData in pairs(getData()[LocalPlayer.Name].inventory.pets) do
 			if PetData.unique == pet_in_slot then
@@ -672,7 +654,7 @@ function build_slot(p_u_66, Index, first_empty_slot)
 		local Cloned2 = ItemImageTemplate:Clone()
 		Cloned2.Parent = v69
 		Cloned2.Image = ImagePetDataBase
-]]
+
 		v69.Activated:Connect(function()
 			Offer.Offers.My.shown_pets[Index] = nil
 			build_all_slots(p_u_66)
