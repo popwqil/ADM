@@ -555,13 +555,13 @@ function update_slots_count()
 	local filled_slots = count_filled_slots()
 	local current_slots = Offer.Offers.My.num_slots
 
-	-- Если все слоты заполнены и их количество меньше 18, добавляем 3 слота
+	-- Увеличиваем слоты на 3, но не более 18
 	if filled_slots >= current_slots and current_slots < 18 then
 		Offer.Offers.My.num_slots = math.min(current_slots + 3, 18)
 		return true
 	end
 
-	-- Если меньше 6 слотов пустых, уменьшаем количество слотов, но не меньше 9
+	-- Уменьшаем слоты на 3, но не менее 9
 	if filled_slots <= current_slots - 6 and current_slots > 9 then
 		local new_slots = math.max(current_slots - 3, 9)
 		if filled_slots <= new_slots then
