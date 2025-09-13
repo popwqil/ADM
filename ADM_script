@@ -595,7 +595,9 @@ function refresh_grid_container(p_u_42)
 	local v49 = v48.Parent
 	local v50 = v48:FindFirstChildWhichIsA("UIGridLayout")
 	local v51 = v48:FindFirstChildWhichIsA("UIPadding")
+
 	if not v50 then return end
+
 	if not v50:GetAttribute("OriginalCellSize") then
 		v50:SetAttribute("OriginalCellSize", v50.CellSize)
 	end
@@ -606,24 +608,31 @@ function refresh_grid_container(p_u_42)
 	if not v48:GetAttribute("OriginalSize") then
 		v48:SetAttribute("OriginalSize", v48.Size)
 	end
+	
 	local v59 = count_filled_slots()
-	local has_add_button = false
-	for i = 1, Offer.Offers.My.num_slots do
-		if not Offer.Offers.My.shown_pets[i] then
-			has_add_button = true
-			break
+
+	local can_add_items = not Offer.Offers.My.accepted_negotiation
+	if can_add_items then
+		local has_empty_slot = false
+		for i = 1, Offer.Offers.My.num_slots do
+			if not Offer.Offers.My.shown_pets[i] then
+				has_empty_slot = true
+				break
+			end
 		end
-	end
-	if has_add_button then
-		v59 = v59 + 1
+		if has_empty_slot then
+			v59 = v59 + 1
+		end
 	end
 	if v59 > 9 then
 		local original_cell_size = v50:GetAttribute("OriginalCellSize")
 		v50.CellSize = original_cell_size - UDim2.fromOffset(4, 4)
+
 		local original_parent_size = v49:GetAttribute("OriginalSize")
 		local original_parent_position = v49:GetAttribute("OriginalPosition")
 		v49.Size = original_parent_size + UDim2.fromOffset(4, 0)
 		v49.Position = original_parent_position - UDim2.fromOffset(2, 0)
+
 		local original_slots_size = v48:GetAttribute("OriginalSize")
 		v48.Size = original_slots_size - UDim2.fromOffset(4, 0)
 	else
@@ -633,14 +642,12 @@ function refresh_grid_container(p_u_42)
 		v48.Size = v48:GetAttribute("OriginalSize")
 	end
 	if v51 then
-		game:GetService("RunService").Heartbeat:Wait()
 		local v60 = UDim2.fromOffset(0, v51.PaddingTop.Offset + v51.PaddingBottom.Offset)
 		local v61 = v50.AbsoluteContentSize
 		if v48.ClassName == "ScrollingFrame" then
 			v48.CanvasSize = UDim2.fromOffset(v61.X, v61.Y) + v60
 		end
 	else
-		game:GetService("RunService").Heartbeat:Wait()
 		local v61 = v50.AbsoluteContentSize
 		if v48.ClassName == "ScrollingFrame" then
 			v48.CanvasSize = UDim2.fromOffset(v61.X, v61.Y)
@@ -892,9 +899,16 @@ local function StartTrade()
 			else
 				Offer.Offers.My.accepted_negotiation = true
 			end
+
+			build_all_slots({
+				["instance"] = {
+					["Slots"] = NegotiationFrame.Body.MyOffer.Slots
+				},
+				["slot_template"] = NegotiationFrame.Body.MyOffer.Slots.SlotTemplate
+			})
+
 			refresh_all()
 		end
-	})
 
 	local ProfileButtonPartner = NegotiationFrame.Header.ProfileButtonPartner
 	Wrap(ProfileButtonPartner, "CustomButton"):start({
