@@ -909,6 +909,7 @@ local function StartTrade()
 
 			refresh_all()
 		end
+	})
 
 	local ProfileButtonPartner = NegotiationFrame.Header.ProfileButtonPartner
 	Wrap(ProfileButtonPartner, "CustomButton"):start({
