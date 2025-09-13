@@ -718,6 +718,11 @@ function build_slot(p_u_66, Index, first_empty_slot)
 				if v161 then
 					Offer.Offers.My.shown_pets[Index] = v161.unique
 					build_all_slots(p_u_66)
+					spawn(function()
+						AcceptWrapButton:set_state("unpressable")
+						wait(5)
+						AcceptWrapButton:set_state("normal")
+					end)
 				end
 			end,
 			["shine"] = true
@@ -852,9 +857,9 @@ local function StartTrade()
 			if Offer.Offers.My.accepted_negotiation and Offer.Offers.Partner.accepted_negotiation  then
 				
 				wait(0.1)
+				
 				NegotiationFrame.Visible = false
 				ConfirmationFrame.Visible = true
-				
 				
 				load("UIManager").apps.DialogApp:dialog({
 					["text"] = "This trade seems unbalanced. Be careful - you could be getting scammed.",
@@ -918,6 +923,22 @@ local function StartTrade()
 	local DeclineWrapButton = Wrap(DeclineButtonNegotiationFrame, "DepthButton"):start({
 		["mouse_button1_click"] = function()
 			FakeTradeApp:Destroy()
+			Offer = {
+				trade_state = "negotiation",
+				trade_make = false,
+				Offers = {
+					My = {
+						shown_pets = {},
+						num_slots = 9,
+						accepted_negotiation = false,
+						accepted_confirmation = false,
+					},
+					Partner = {
+						accepted_negotiation = false,
+						accepted_confirmation = false,
+					},
+				},
+			}
 		end
 	})
 
