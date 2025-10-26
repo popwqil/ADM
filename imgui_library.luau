@@ -48,9 +48,8 @@ local ImGui = {
 
 --// Universal functions
 local NullFunction = function() end
-local CloneRef = cloneref or function(_)return _ end
 local function GetService(...): ServiceProvider
-	return CloneRef(game:GetService(...))
+	return game:GetService(...)
 end
 
 function ImGui:Warn(...)
@@ -864,25 +863,25 @@ function ImGui:ContainerClass(Frame: Frame, Class, Window)
 	-- This will use UIDragdetectors in the upcoming release, please do not report this!
 	function ContainerClass:Slider(Config)
 		Config = Config or {}
-		
+
 		--// Unpack config
 		local Value = Config.Value or 0
 		local ValueFormat = Config.Format or "%.d"
 		local IsProgress = Config.Progress
 		Config.Name = Config.Label or ""
-		
+
 		--// Slider element
 		local Slider: TextButton = Prefabs.Slider:Clone()
 		local UIPadding = Slider:FindFirstChildOfClass("UIPadding")
 		local Grab: Frame = Slider.Grab
 		local ValueText = Slider.ValueText
 		local Label = Slider.Label
-		
+
 		--// Input data
 		local Dragging = false
 		local MouseMoveConnection = nil
 		local InputType = Enum.UserInputType.MouseButton1
-		
+
 		local ObjectClass = self:NewInstance(Slider, Config)
 
 		local function Callback(...)
@@ -947,7 +946,7 @@ function ImGui:ContainerClass(Frame: Frame, Class, Window)
 		local function MouseMove()
 			if Config.ReadOnly then return end
 			if not Dragging then return end
-			
+
 			local MouseX = UserInputService:GetMouseLocation().X
 			local LeftPos = Slider.AbsolutePosition.X
 
@@ -1121,10 +1120,10 @@ function ImGui:ContainerClass(Frame: Frame, Class, Window)
 
 			return self
 		end
-    function Config:SetPlaceholder(Text)
-        Config.Placeholder = Text
-            ValueText.Text = Text
-    end
+		function Config:SetPlaceholder(Text)
+			Config.Placeholder = Text
+			ValueText.Text = Text
+		end
 
 		local function ToggleOpen()
 			if Dropdown then
