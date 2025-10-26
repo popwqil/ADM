@@ -100,7 +100,9 @@ end
 local UI = ImGui:FetchUI()
 local Prefabs = UI.Prefabs
 ImGui.Prefabs = Prefabs
-Prefabs.Visible = false
+pcall(function()
+	Prefabs.Visible = false
+end)
 
 --// Styles
 local AddionalStyles = {
